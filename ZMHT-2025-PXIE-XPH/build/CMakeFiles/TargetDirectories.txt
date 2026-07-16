@@ -1,0 +1,3 @@
+/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/tcp_server_can.dir
+/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/edit_cache.dir
+/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/rebuild_cache.dir

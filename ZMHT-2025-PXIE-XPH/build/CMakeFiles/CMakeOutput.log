@@ -1,0 +1,424 @@
+The target system is: Linux -  - arm
+The host system is: Linux - 6.8.0-134-generic - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/3.22.1/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-g++ 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/3.22.1/CompilerIdCXX/a.out"
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_42af4/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_42af4.dir/build.make CMakeFiles/cmTC_42af4.dir/build
+gmake[1]: Entering directory '/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o
+/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc   -v -o CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.22/Modules/CMakeCCompilerABI.c
+Using built-in specs.
+COLLECT_GCC=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc
+Target: arm-linux-gnueabihf
+Configured with: /proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/snapshots//gcc-linaro-7.2-2017.11-rc1/configure SHELL=/bin/sh --with-bugurl=https://bugs.linaro.org --with-mpc=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-mpfr=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gmp=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gnu-as --with-gnu-ld --disable-libstdcxx-pch --disable-libmudflap --with-cloog=no --with-ppl=no --with-isl=no --disable-nls --enable-c99 --enable-gnu-indirect-function --disable-multilib --with-tune=cortex-a9 --with-arch=armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-mode=arm --disable-multilib --enable-multiarch CFLAGS=-O2 CXXFLAGS=-O2 --disable-silent-rules --enable-libquadmath --enable-libg2c --enable-symvers=gnu --enable-libstdcxx-pch --enable-libssp --disable-libmudflap --enable-checking=release --enable-cheaders=c_global --enable-poison-system-directories --enable-clocale=generic --enable-shared --enable-threads=posix --disable-multilib --enable-c99 --without-local-prefix --enable-lto --disable-bootstrap --with-linker-hash-style=gnu --with-ppl=no --with-cloog=no --without-isl --enable-nls --enable-__cxa_atexit --with-build-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-plugins --enable-linker-build-id --enable-long-long --enable-shared --with-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-languages=c,c++,lto --enable-checking=yes --disable-bootstrap --with-bugurl=https://bugs.linaro.org --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --target=arm-linux-gnueabihf --prefix=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu
+Thread model: posix
+gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11-rc1) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o' '-c' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu'
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/cc1 -quiet -v -imultilib . -imultiarch arm-linux-gnueabihf -iprefix /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/ -isysroot /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc /usr/share/cmake-3.22/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -march=armv7-a -mtune=cortex-a9 -mfloat-abi=hard -mfpu=vfpv3-d16 -marm -mtls-dialect=gnu -auxbase-strip CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o -version -o /tmp/ccEowVI5.s
+GNU C11 (Linaro GCC 7.2-2017.11-rc1) version 7.2.1 20171011 (arm-linux-gnueabihf)
+	compiled by GNU C version 6.2.0, GMP version 6.0.0, MPFR version 3.1.3, MPC version 1.0.3, isl version none
+GGC heuristics: --param ggc-min-expand=30 --param ggc-min-heapsize=4096
+ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/include"
+ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/local/include/arm-linux-gnueabihf"
+ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/local/include"
+ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed"
+ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include"
+ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include/arm-linux-gnueabihf"
+#include "..." search starts here:
+#include <...> search starts here:
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include
+End of search list.
+GNU C11 (Linaro GCC 7.2-2017.11-rc1) version 7.2.1 20171011 (arm-linux-gnueabihf)
+	compiled by GNU C version 6.2.0, GMP version 6.0.0, MPFR version 3.1.3, MPC version 1.0.3, isl version none
+GGC heuristics: --param ggc-min-expand=30 --param ggc-min-heapsize=4096
+Compiler executable checksum: 3cbbee38f308c63336439dae9b639ddb
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o' '-c' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu'
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/as -v -march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -meabi=5 -o CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o /tmp/ccEowVI5.s
+GNU assembler version 2.29.1 (arm-linux-gnueabihf) using BFD version (Linaro_Binutils-) 2.29.1.20171214
+COMPILER_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/
+LIBRARY_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o' '-c' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu'
+Linking C executable cmTC_42af4
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_42af4.dir/link.txt --verbose=1
+/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc  -v CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o -o cmTC_42af4 
+Using built-in specs.
+COLLECT_GCC=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc
+COLLECT_LTO_WRAPPER=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/lto-wrapper
+Target: arm-linux-gnueabihf
+Configured with: /proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/snapshots//gcc-linaro-7.2-2017.11-rc1/configure SHELL=/bin/sh --with-bugurl=https://bugs.linaro.org --with-mpc=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-mpfr=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gmp=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gnu-as --with-gnu-ld --disable-libstdcxx-pch --disable-libmudflap --with-cloog=no --with-ppl=no --with-isl=no --disable-nls --enable-c99 --enable-gnu-indirect-function --disable-multilib --with-tune=cortex-a9 --with-arch=armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-mode=arm --disable-multilib --enable-multiarch CFLAGS=-O2 CXXFLAGS=-O2 --disable-silent-rules --enable-libquadmath --enable-libg2c --enable-symvers=gnu --enable-libstdcxx-pch --enable-libssp --disable-libmudflap --enable-checking=release --enable-cheaders=c_global --enable-poison-system-directories --enable-clocale=generic --enable-shared --enable-threads=posix --disable-multilib --enable-c99 --without-local-prefix --enable-lto --disable-bootstrap --with-linker-hash-style=gnu --with-ppl=no --with-cloog=no --without-isl --enable-nls --enable-__cxa_atexit --with-build-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-plugins --enable-linker-build-id --enable-long-long --enable-shared --with-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-languages=c,c++,lto --enable-checking=yes --disable-bootstrap --with-bugurl=https://bugs.linaro.org --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --target=arm-linux-gnueabihf --prefix=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu
+Thread model: posix
+gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11-rc1) 
+COMPILER_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/
+LIBRARY_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_42af4' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu'
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/collect2 -plugin /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/liblto_plugin.so -plugin-opt=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/cc4ZjXla.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc --build-id --eh-frame-hdr --hash-style=gnu -dynamic-linker /lib/ld-linux-armhf.so.3 -X -m armelf_linux_eabi -o cmTC_42af4 /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crt1.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crti.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1 -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_42af4' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu'
+gmake[1]: Leaving directory '/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/CMakeTmp'
+
+
+
+Parsed C implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include]
+    add: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed]
+    add: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include]
+    add: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include]
+  end of search list found
+  collapse include dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/include]
+  collapse include dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed]
+  collapse include dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/include]
+  collapse include dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/include]
+  implicit include dirs: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/include;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/include;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/include]
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(arm-linux-gnueabihf-ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_42af4/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_42af4.dir/build.make CMakeFiles/cmTC_42af4.dir/build]
+  ignore line: [gmake[1]: Entering directory '/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc   -v -o CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.22/Modules/CMakeCCompilerABI.c]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc]
+  ignore line: [Target: arm-linux-gnueabihf]
+  ignore line: [Configured with: /proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/snapshots//gcc-linaro-7.2-2017.11-rc1/configure SHELL=/bin/sh --with-bugurl=https://bugs.linaro.org --with-mpc=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-mpfr=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gmp=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gnu-as --with-gnu-ld --disable-libstdcxx-pch --disable-libmudflap --with-cloog=no --with-ppl=no --with-isl=no --disable-nls --enable-c99 --enable-gnu-indirect-function --disable-multilib --with-tune=cortex-a9 --with-arch=armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-mode=arm --disable-multilib --enable-multiarch CFLAGS=-O2 CXXFLAGS=-O2 --disable-silent-rules --enable-libquadmath --enable-libg2c --enable-symvers=gnu --enable-libstdcxx-pch --enable-libssp --disable-libmudflap --enable-checking=release --enable-cheaders=c_global --enable-poison-system-directories --enable-clocale=generic --enable-shared --enable-threads=posix --disable-multilib --enable-c99 --without-local-prefix --enable-lto --disable-bootstrap --with-linker-hash-style=gnu --with-ppl=no --with-cloog=no --without-isl --enable-nls --enable-__cxa_atexit --with-build-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-plugins --enable-linker-build-id --enable-long-long --enable-shared --with-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-languages=c,c++,lto --enable-checking=yes --disable-bootstrap --with-bugurl=https://bugs.linaro.org --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --target=arm-linux-gnueabihf --prefix=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11-rc1) ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o' '-c' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu']
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/cc1 -quiet -v -imultilib . -imultiarch arm-linux-gnueabihf -iprefix /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/ -isysroot /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc /usr/share/cmake-3.22/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -march=armv7-a -mtune=cortex-a9 -mfloat-abi=hard -mfpu=vfpv3-d16 -marm -mtls-dialect=gnu -auxbase-strip CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o -version -o /tmp/ccEowVI5.s]
+  ignore line: [GNU C11 (Linaro GCC 7.2-2017.11-rc1) version 7.2.1 20171011 (arm-linux-gnueabihf)]
+  ignore line: [	compiled by GNU C version 6.2.0  GMP version 6.0.0  MPFR version 3.1.3  MPC version 1.0.3  isl version none]
+  ignore line: [GGC heuristics: --param ggc-min-expand=30 --param ggc-min-heapsize=4096]
+  ignore line: [ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/include"]
+  ignore line: [ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/local/include/arm-linux-gnueabihf"]
+  ignore line: [ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/local/include"]
+  ignore line: [ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed"]
+  ignore line: [ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include"]
+  ignore line: [ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include/arm-linux-gnueabihf"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include]
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed]
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include]
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include]
+  ignore line: [End of search list.]
+  ignore line: [GNU C11 (Linaro GCC 7.2-2017.11-rc1) version 7.2.1 20171011 (arm-linux-gnueabihf)]
+  ignore line: [	compiled by GNU C version 6.2.0  GMP version 6.0.0  MPFR version 3.1.3  MPC version 1.0.3  isl version none]
+  ignore line: [GGC heuristics: --param ggc-min-expand=30 --param ggc-min-heapsize=4096]
+  ignore line: [Compiler executable checksum: 3cbbee38f308c63336439dae9b639ddb]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o' '-c' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu']
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/as -v -march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -meabi=5 -o CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o /tmp/ccEowVI5.s]
+  ignore line: [GNU assembler version 2.29.1 (arm-linux-gnueabihf) using BFD version (Linaro_Binutils-) 2.29.1.20171214]
+  ignore line: [COMPILER_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/]
+  ignore line: [LIBRARY_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o' '-c' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu']
+  ignore line: [Linking C executable cmTC_42af4]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_42af4.dir/link.txt --verbose=1]
+  ignore line: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc  -v CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o -o cmTC_42af4 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc]
+  ignore line: [COLLECT_LTO_WRAPPER=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/lto-wrapper]
+  ignore line: [Target: arm-linux-gnueabihf]
+  ignore line: [Configured with: /proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/snapshots//gcc-linaro-7.2-2017.11-rc1/configure SHELL=/bin/sh --with-bugurl=https://bugs.linaro.org --with-mpc=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-mpfr=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gmp=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gnu-as --with-gnu-ld --disable-libstdcxx-pch --disable-libmudflap --with-cloog=no --with-ppl=no --with-isl=no --disable-nls --enable-c99 --enable-gnu-indirect-function --disable-multilib --with-tune=cortex-a9 --with-arch=armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-mode=arm --disable-multilib --enable-multiarch CFLAGS=-O2 CXXFLAGS=-O2 --disable-silent-rules --enable-libquadmath --enable-libg2c --enable-symvers=gnu --enable-libstdcxx-pch --enable-libssp --disable-libmudflap --enable-checking=release --enable-cheaders=c_global --enable-poison-system-directories --enable-clocale=generic --enable-shared --enable-threads=posix --disable-multilib --enable-c99 --without-local-prefix --enable-lto --disable-bootstrap --with-linker-hash-style=gnu --with-ppl=no --with-cloog=no --without-isl --enable-nls --enable-__cxa_atexit --with-build-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-plugins --enable-linker-build-id --enable-long-long --enable-shared --with-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-languages=c,c++,lto --enable-checking=yes --disable-bootstrap --with-bugurl=https://bugs.linaro.org --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --target=arm-linux-gnueabihf --prefix=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11-rc1) ]
+  ignore line: [COMPILER_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/]
+  ignore line: [LIBRARY_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_42af4' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu']
+  link line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/collect2 -plugin /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/liblto_plugin.so -plugin-opt=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/cc4ZjXla.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc --build-id --eh-frame-hdr --hash-style=gnu -dynamic-linker /lib/ld-linux-armhf.so.3 -X -m armelf_linux_eabi -o cmTC_42af4 /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crt1.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crti.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1 -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crtn.o]
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/cc4ZjXla.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--sysroot=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux-armhf.so.3] ==> ignore
+    arg [-X] ==> ignore
+    arg [-m] ==> ignore
+    arg [armelf_linux_eabi] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_42af4] ==> ignore
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crt1.o] ==> obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crt1.o]
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crti.o] ==> obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crti.o]
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o] ==> obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib]
+    arg [CMakeFiles/cmTC_42af4.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o] ==> obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o]
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crtn.o] ==> obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crtn.o]
+  collapse obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crt1.o] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crt1.o]
+  collapse obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crti.o] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crti.o]
+  collapse obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o]
+  collapse obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o]
+  collapse obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crtn.o] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crtn.o]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/lib]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/lib]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit objs: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crt1.o;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crti.o;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crtn.o]
+  implicit dirs: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/lib;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/lib;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib]
+  implicit fwks: []
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_ee449/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ee449.dir/build.make CMakeFiles/cmTC_ee449.dir/build
+gmake[1]: Entering directory '/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o
+/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-g++   -v -o CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp
+Using built-in specs.
+COLLECT_GCC=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-g++
+Target: arm-linux-gnueabihf
+Configured with: /proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/snapshots//gcc-linaro-7.2-2017.11-rc1/configure SHELL=/bin/sh --with-bugurl=https://bugs.linaro.org --with-mpc=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-mpfr=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gmp=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gnu-as --with-gnu-ld --disable-libstdcxx-pch --disable-libmudflap --with-cloog=no --with-ppl=no --with-isl=no --disable-nls --enable-c99 --enable-gnu-indirect-function --disable-multilib --with-tune=cortex-a9 --with-arch=armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-mode=arm --disable-multilib --enable-multiarch CFLAGS=-O2 CXXFLAGS=-O2 --disable-silent-rules --enable-libquadmath --enable-libg2c --enable-symvers=gnu --enable-libstdcxx-pch --enable-libssp --disable-libmudflap --enable-checking=release --enable-cheaders=c_global --enable-poison-system-directories --enable-clocale=generic --enable-shared --enable-threads=posix --disable-multilib --enable-c99 --without-local-prefix --enable-lto --disable-bootstrap --with-linker-hash-style=gnu --with-ppl=no --with-cloog=no --without-isl --enable-nls --enable-__cxa_atexit --with-build-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-plugins --enable-linker-build-id --enable-long-long --enable-shared --with-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-languages=c,c++,lto --enable-checking=yes --disable-bootstrap --with-bugurl=https://bugs.linaro.org --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --target=arm-linux-gnueabihf --prefix=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu
+Thread model: posix
+gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11-rc1) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu'
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/cc1plus -quiet -v -imultilib . -imultiarch arm-linux-gnueabihf -iprefix /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/ -isysroot /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc -D_GNU_SOURCE /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -march=armv7-a -mtune=cortex-a9 -mfloat-abi=hard -mfpu=vfpv3-d16 -marm -mtls-dialect=gnu -auxbase-strip CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o -version -o /tmp/ccJZOAPJ.s
+GNU C++14 (Linaro GCC 7.2-2017.11-rc1) version 7.2.1 20171011 (arm-linux-gnueabihf)
+	compiled by GNU C version 6.2.0, GMP version 6.0.0, MPFR version 3.1.3, MPC version 1.0.3, isl version none
+GGC heuristics: --param ggc-min-expand=30 --param ggc-min-heapsize=4096
+ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1"
+ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/arm-linux-gnueabihf/."
+ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/backward"
+ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/include"
+ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/local/include/arm-linux-gnueabihf"
+ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/local/include"
+ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed"
+ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include"
+ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include/arm-linux-gnueabihf"
+#include "..." search starts here:
+#include <...> search starts here:
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/arm-linux-gnueabihf/.
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/backward
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include
+End of search list.
+GNU C++14 (Linaro GCC 7.2-2017.11-rc1) version 7.2.1 20171011 (arm-linux-gnueabihf)
+	compiled by GNU C version 6.2.0, GMP version 6.0.0, MPFR version 3.1.3, MPC version 1.0.3, isl version none
+GGC heuristics: --param ggc-min-expand=30 --param ggc-min-heapsize=4096
+Compiler executable checksum: b400af49ba05aacf35f6155b2e98ace8
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu'
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/as -v -march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -meabi=5 -o CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccJZOAPJ.s
+GNU assembler version 2.29.1 (arm-linux-gnueabihf) using BFD version (Linaro_Binutils-) 2.29.1.20171214
+COMPILER_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/
+LIBRARY_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu'
+Linking CXX executable cmTC_ee449
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ee449.dir/link.txt --verbose=1
+/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-g++  -v CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_ee449 
+Using built-in specs.
+COLLECT_GCC=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-g++
+COLLECT_LTO_WRAPPER=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/lto-wrapper
+Target: arm-linux-gnueabihf
+Configured with: /proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/snapshots//gcc-linaro-7.2-2017.11-rc1/configure SHELL=/bin/sh --with-bugurl=https://bugs.linaro.org --with-mpc=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-mpfr=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gmp=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gnu-as --with-gnu-ld --disable-libstdcxx-pch --disable-libmudflap --with-cloog=no --with-ppl=no --with-isl=no --disable-nls --enable-c99 --enable-gnu-indirect-function --disable-multilib --with-tune=cortex-a9 --with-arch=armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-mode=arm --disable-multilib --enable-multiarch CFLAGS=-O2 CXXFLAGS=-O2 --disable-silent-rules --enable-libquadmath --enable-libg2c --enable-symvers=gnu --enable-libstdcxx-pch --enable-libssp --disable-libmudflap --enable-checking=release --enable-cheaders=c_global --enable-poison-system-directories --enable-clocale=generic --enable-shared --enable-threads=posix --disable-multilib --enable-c99 --without-local-prefix --enable-lto --disable-bootstrap --with-linker-hash-style=gnu --with-ppl=no --with-cloog=no --without-isl --enable-nls --enable-__cxa_atexit --with-build-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-plugins --enable-linker-build-id --enable-long-long --enable-shared --with-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-languages=c,c++,lto --enable-checking=yes --disable-bootstrap --with-bugurl=https://bugs.linaro.org --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --target=arm-linux-gnueabihf --prefix=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu
+Thread model: posix
+gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11-rc1) 
+COMPILER_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/
+LIBRARY_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_ee449' '-shared-libgcc' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu'
+ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/collect2 -plugin /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/liblto_plugin.so -plugin-opt=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/cctZKESC.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc --build-id --eh-frame-hdr --hash-style=gnu -dynamic-linker /lib/ld-linux-armhf.so.3 -X -m armelf_linux_eabi -o cmTC_ee449 /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crt1.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crti.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1 -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_ee449' '-shared-libgcc' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu'
+gmake[1]: Leaving directory '/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/CMakeTmp'
+
+
+
+Parsed CXX implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1]
+    add: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/arm-linux-gnueabihf/.]
+    add: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/backward]
+    add: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include]
+    add: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed]
+    add: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include]
+    add: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include]
+  end of search list found
+  collapse include dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/include/c++/7.2.1]
+  collapse include dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/arm-linux-gnueabihf/.] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/include/c++/7.2.1/arm-linux-gnueabihf]
+  collapse include dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/backward] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/include/c++/7.2.1/backward]
+  collapse include dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/include]
+  collapse include dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed]
+  collapse include dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/include]
+  collapse include dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/include]
+  implicit include dirs: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/include/c++/7.2.1;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/include/c++/7.2.1/arm-linux-gnueabihf;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/include/c++/7.2.1/backward;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/include;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/include;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/include]
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(arm-linux-gnueabihf-ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_ee449/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ee449.dir/build.make CMakeFiles/cmTC_ee449.dir/build]
+  ignore line: [gmake[1]: Entering directory '/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-2025-PXIE-XPH/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-g++   -v -o CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-g++]
+  ignore line: [Target: arm-linux-gnueabihf]
+  ignore line: [Configured with: /proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/snapshots//gcc-linaro-7.2-2017.11-rc1/configure SHELL=/bin/sh --with-bugurl=https://bugs.linaro.org --with-mpc=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-mpfr=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gmp=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gnu-as --with-gnu-ld --disable-libstdcxx-pch --disable-libmudflap --with-cloog=no --with-ppl=no --with-isl=no --disable-nls --enable-c99 --enable-gnu-indirect-function --disable-multilib --with-tune=cortex-a9 --with-arch=armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-mode=arm --disable-multilib --enable-multiarch CFLAGS=-O2 CXXFLAGS=-O2 --disable-silent-rules --enable-libquadmath --enable-libg2c --enable-symvers=gnu --enable-libstdcxx-pch --enable-libssp --disable-libmudflap --enable-checking=release --enable-cheaders=c_global --enable-poison-system-directories --enable-clocale=generic --enable-shared --enable-threads=posix --disable-multilib --enable-c99 --without-local-prefix --enable-lto --disable-bootstrap --with-linker-hash-style=gnu --with-ppl=no --with-cloog=no --without-isl --enable-nls --enable-__cxa_atexit --with-build-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-plugins --enable-linker-build-id --enable-long-long --enable-shared --with-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-languages=c,c++,lto --enable-checking=yes --disable-bootstrap --with-bugurl=https://bugs.linaro.org --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --target=arm-linux-gnueabihf --prefix=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11-rc1) ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu']
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/cc1plus -quiet -v -imultilib . -imultiarch arm-linux-gnueabihf -iprefix /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/ -isysroot /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc -D_GNU_SOURCE /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -march=armv7-a -mtune=cortex-a9 -mfloat-abi=hard -mfpu=vfpv3-d16 -marm -mtls-dialect=gnu -auxbase-strip CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o -version -o /tmp/ccJZOAPJ.s]
+  ignore line: [GNU C++14 (Linaro GCC 7.2-2017.11-rc1) version 7.2.1 20171011 (arm-linux-gnueabihf)]
+  ignore line: [	compiled by GNU C version 6.2.0  GMP version 6.0.0  MPFR version 3.1.3  MPC version 1.0.3  isl version none]
+  ignore line: [GGC heuristics: --param ggc-min-expand=30 --param ggc-min-heapsize=4096]
+  ignore line: [ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1"]
+  ignore line: [ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/arm-linux-gnueabihf/."]
+  ignore line: [ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/backward"]
+  ignore line: [ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/include"]
+  ignore line: [ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/local/include/arm-linux-gnueabihf"]
+  ignore line: [ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/local/include"]
+  ignore line: [ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed"]
+  ignore line: [ignoring duplicate directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/../../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include"]
+  ignore line: [ignoring nonexistent directory "/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include/arm-linux-gnueabihf"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1]
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/arm-linux-gnueabihf/.]
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include/c++/7.2.1/backward]
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include]
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/include-fixed]
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/include]
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/include]
+  ignore line: [End of search list.]
+  ignore line: [GNU C++14 (Linaro GCC 7.2-2017.11-rc1) version 7.2.1 20171011 (arm-linux-gnueabihf)]
+  ignore line: [	compiled by GNU C version 6.2.0  GMP version 6.0.0  MPFR version 3.1.3  MPC version 1.0.3  isl version none]
+  ignore line: [GGC heuristics: --param ggc-min-expand=30 --param ggc-min-heapsize=4096]
+  ignore line: [Compiler executable checksum: b400af49ba05aacf35f6155b2e98ace8]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu']
+  ignore line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/as -v -march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -meabi=5 -o CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccJZOAPJ.s]
+  ignore line: [GNU assembler version 2.29.1 (arm-linux-gnueabihf) using BFD version (Linaro_Binutils-) 2.29.1.20171214]
+  ignore line: [COMPILER_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/]
+  ignore line: [LIBRARY_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu']
+  ignore line: [Linking CXX executable cmTC_ee449]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ee449.dir/link.txt --verbose=1]
+  ignore line: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-g++  -v CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_ee449 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-g++]
+  ignore line: [COLLECT_LTO_WRAPPER=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/lto-wrapper]
+  ignore line: [Target: arm-linux-gnueabihf]
+  ignore line: [Configured with: /proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/snapshots//gcc-linaro-7.2-2017.11-rc1/configure SHELL=/bin/sh --with-bugurl=https://bugs.linaro.org --with-mpc=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-mpfr=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gmp=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu --with-gnu-as --with-gnu-ld --disable-libstdcxx-pch --disable-libmudflap --with-cloog=no --with-ppl=no --with-isl=no --disable-nls --enable-c99 --enable-gnu-indirect-function --disable-multilib --with-tune=cortex-a9 --with-arch=armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-mode=arm --disable-multilib --enable-multiarch CFLAGS=-O2 CXXFLAGS=-O2 --disable-silent-rules --enable-libquadmath --enable-libg2c --enable-symvers=gnu --enable-libstdcxx-pch --enable-libssp --disable-libmudflap --enable-checking=release --enable-cheaders=c_global --enable-poison-system-directories --enable-clocale=generic --enable-shared --enable-threads=posix --disable-multilib --enable-c99 --without-local-prefix --enable-lto --disable-bootstrap --with-linker-hash-style=gnu --with-ppl=no --with-cloog=no --without-isl --enable-nls --enable-__cxa_atexit --with-build-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-plugins --enable-linker-build-id --enable-long-long --enable-shared --with-sysroot=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu/arm-linux-gnueabihf/libc --enable-languages=c,c++,lto --enable-checking=yes --disable-bootstrap --with-bugurl=https://bugs.linaro.org --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --target=arm-linux-gnueabihf --prefix=/proj/esdt_sdk/gnu_abe/ABE/builds/lin/arm/arm-linux/builds/destdir/x86_64-unknown-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11-rc1) ]
+  ignore line: [COMPILER_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/bin/]
+  ignore line: [LIBRARY_PATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib/:/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_ee449' '-shared-libgcc' '-march=armv7-a' '-mtune=cortex-a9' '-mfloat-abi=hard' '-mfpu=vfpv3-d16' '-marm' '-mtls-dialect=gnu']
+  link line: [ /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/collect2 -plugin /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/liblto_plugin.so -plugin-opt=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/cctZKESC.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc --build-id --eh-frame-hdr --hash-style=gnu -dynamic-linker /lib/ld-linux-armhf.so.3 -X -m armelf_linux_eabi -o cmTC_ee449 /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crt1.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crti.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1 -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib -L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crtn.o]
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../libexec/gcc/arm-linux-gnueabihf/7.2.1/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/cctZKESC.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [--sysroot=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux-armhf.so.3] ==> ignore
+    arg [-X] ==> ignore
+    arg [-m] ==> ignore
+    arg [armelf_linux_eabi] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_ee449] ==> ignore
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crt1.o] ==> obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crt1.o]
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crti.o] ==> obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crti.o]
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o] ==> obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib]
+    arg [-L/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib] ==> dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib]
+    arg [CMakeFiles/cmTC_ee449.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o] ==> obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o]
+    arg [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crtn.o] ==> obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crtn.o]
+  collapse obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crt1.o] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crt1.o]
+  collapse obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crti.o] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crti.o]
+  collapse obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o]
+  collapse obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o]
+  collapse obj [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib/crtn.o] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crtn.o]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../lib/gcc/arm-linux-gnueabihf/7.2.1/../../../../arm-linux-gnueabihf/lib] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/lib]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/lib] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/lib]
+  collapse library dir [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/../arm-linux-gnueabihf/libc/usr/lib] ==> [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib]
+  implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+  implicit objs: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crt1.o;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crti.o;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/crtbegin.o;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/crtend.o;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib/crtn.o]
+  implicit dirs: [/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/lib;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/lib;/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/lib]
+  implicit fwks: []
+
+
