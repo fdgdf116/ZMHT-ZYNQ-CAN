@@ -44,8 +44,8 @@
 #define BCAST_MODE_AB_ALTERNATE 3
 #define BCAST_ENABLE            1
 #define BCAST_CAN_MASK          0x3FU
-#define BCAST_MAX_FRAMES_PER_GROUP 64
-#define BCAST_GROUP_QUEUE_DEPTH 32
+#define BCAST_MAX_FRAMES_PER_GROUP 128
+#define BCAST_GROUP_QUEUE_DEPTH 16
 #define BCAST_CAN_WRITE_TIMEOUT_MS 5
 
 #define MAX_CLIENTS 5
@@ -653,6 +653,8 @@ static pthread_mutex_t can_write_mutex[AXICAN_MAX];
 static BroadcastChannelWake g_bcast_wake[AXICAN_MAX];
 static uint32_t g_bcast_group_id = 0;
 static pthread_mutex_t bcast_group_id_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t bcast_rx_gate_mutex = PTHREAD_MUTEX_INITIALIZER;
+static uint8_t g_bcast_rx_gate_open = 0;
 
 // 函数声明
 // static uint8_t calculate_checksum(const uint8_t *data, uint32_t len);
@@ -2437,6 +2439,22 @@ static uint32_t get_broadcast_store_mask(void) {
     return mask & BCAST_CAN_MASK;
 }
 
+static void set_broadcast_rx_gate(uint8_t open) {
+    pthread_mutex_lock(&bcast_rx_gate_mutex);
+    g_bcast_rx_gate_open = open ? 1 : 0;
+    pthread_mutex_unlock(&bcast_rx_gate_mutex);
+}
+
+static int is_broadcast_rx_gate_open(void) {
+    int open;
+
+    pthread_mutex_lock(&bcast_rx_gate_mutex);
+    open = g_bcast_rx_gate_open;
+    pthread_mutex_unlock(&bcast_rx_gate_mutex);
+
+    return open;
+}
+
 static int validate_48byte_can_payload(const PC_ARM_DATA_DATA *frame) {
     if (!frame) {
         return -EINVAL;
@@ -2490,6 +2508,12 @@ static int enqueue_broadcast_group(uint8_t target_ch, const PC_ARM_DATA_DATA *fr
     if (target_ch >= AXICAN_MAX || !can_configs[target_ch].valid) {
         printf("[BCAST] invalid packet channel %u\n", target_ch);
         send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, EINVAL, "broadcast packet channel invalid");
+        return -EINVAL;
+    }
+
+    if (!is_broadcast_rx_gate_open()) {
+        printf("[BCAST] PPS receive gate closed, drop group for channel %u\n", target_ch);
+        send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, EINVAL, "broadcast receive gate closed");
         return -EINVAL;
     }
 
@@ -3939,6 +3963,9 @@ static void *pps_irq_thread(void *arg) {
             unsigned int irq_count = 0;
             ioctl(fd, ZMUAV_PL2PS_IRQ_GET_IRQ_COUNT, &irq_count);
 
+            reset_broadcast_buffers();
+            set_broadcast_rx_gate(1);
+
             uint32_t wake_mask = select_broadcast_mask_on_pps();
             if (wake_mask != 0) {
             // printf("[PPS] irq=%u wake broadcast mask=0x%X\n", irq_count, wake_mask);
@@ -4249,6 +4276,7 @@ int main(void) {
     pthread_mutex_init(&data_counter_mutex, NULL);
     pthread_mutex_init(&bcast_cfg_mutex, NULL);
     pthread_mutex_init(&bcast_group_id_mutex, NULL);
+    pthread_mutex_init(&bcast_rx_gate_mutex, NULL);
 
     for (int i = 0; i < AXICAN_MAX; i++) {
         pthread_mutex_init(&can_write_mutex[i], NULL);
@@ -4524,6 +4552,7 @@ int main(void) {
 	    pthread_mutex_destroy(&data_counter_mutex);
     pthread_mutex_destroy(&bcast_cfg_mutex);
     pthread_mutex_destroy(&bcast_group_id_mutex);
+    pthread_mutex_destroy(&bcast_rx_gate_mutex);
     for (int i = 0; i < AXICAN_MAX; i++) {
         pthread_mutex_destroy(&can_write_mutex[i]);
         pthread_mutex_destroy(&g_bcast_wake[i].mutex);
