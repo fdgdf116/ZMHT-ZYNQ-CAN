@@ -47,6 +47,7 @@
 #define BCAST_MAX_FRAMES_PER_GROUP 128
 #define BCAST_GROUP_QUEUE_DEPTH 16
 #define BCAST_CAN_WRITE_TIMEOUT_MS 5
+#define BCAST_PPS_RX_WINDOW_MS 1000
 
 #define MAX_CLIENTS 5
 #define BUFFER_SIZE 4096
@@ -63,6 +64,10 @@
 #define PC_ARM_DATA_WORD 0x04CCF0FF
 #define PC_STATUS_HEAD 0X499602D2
 #define PC_ARM_STATUS_WORD 0xFFF0CC01
+#define ARM_APP_VERSION 0x20260701UL
+#define VERSION_QUERY_ARM 0xAA
+#define VERSION_QUERY_FPGA 0xBB
+#define VERSION_QUERY_FAILED 0xFFFFFFFFUL
 
 //宏定义
 #define CAN_FIFO_TWO_FRAME_SIZE (16)
@@ -235,6 +240,8 @@ typedef struct {
     pthread_mutex_t mutex;
     pthread_cond_t cond;
     uint32_t pending;
+    uint8_t armed;
+    uint64_t armed_until_ms;
 } BroadcastChannelWake;
 
 // 记录CAN配置的结构体
@@ -304,7 +311,7 @@ typedef struct {
 } CAN_Data_Protocol;
 
 // CAN启动和关闭功能应答帧
-typedef struct {    
+typedef struct {
     uint32_t CAN_DATA_RE_HEAD;
     uint32_t CAN_DATA_RE_LENGTH;
     uint16_t CAN_DATA_RE_COUNT;
@@ -312,6 +319,15 @@ typedef struct {
     uint32_t CAN_DATA_RE_Checksum;
     uint32_t CAN_DATA_RE_STATUS;
 } CAN_Send_Response;
+
+typedef struct {
+    uint32_t CAN_DATA_RE_HEAD;
+    uint32_t CAN_DATA_RE_LENGTH;
+    uint16_t CAN_DATA_RE_COUNT;
+    uint16_t CAN_DATA_RE_COMMOND;
+    uint32_t CAN_DATA_RE_Checksum;
+    uint32_t version;
+} VersionQueryResponse;
 
 // 缓冲区查询请求参数
 typedef struct {
@@ -571,7 +587,8 @@ typedef enum {
     CMD_CAN_CONFIG = 0x0101,
     CMD_CAN_INFO_QUERY = 0x0102,
     CMD_CAN_START_STOP = 0x0103,
-    CMD_CAN_BROADCAST_CONFIG = 0x0104
+    CMD_CAN_BROADCAST_CONFIG = 0x0104,
+    CMD_VERSION_QUERY = 0xFF05
 } CmdType;
 
 // 命令请求包结构
@@ -664,6 +681,7 @@ static void send_received_can_frame_to_pc(uint8_t can_id, const struct axican_fr
 static void process_simulator_mode_data(uint8_t can_id, PC_ARM_SIMULATOR_DATA *data);
 static void handle_normal_mode(int can_id, const struct axican_frame* frame);
 static void handle_broadcast_config(int sock, ReqPacket *req);
+static void handle_version_query(int sock, ReqPacket *req);
 static int process_9012_can_payload_frames(const uint8_t *payload, size_t payload_len, uint32_t packet_channel);
 static void *pps_irq_thread(void *arg);
 static void *broadcast_can_send_thread(void *parameter);
@@ -686,7 +704,6 @@ static void send_event(EventLevel level, EventID id, int32_t error_code, const c
     
     if (event_socket == -1) {
         pthread_mutex_unlock(&event_sock_mutex);
-        printf("No event client connected, cannot send event: %s\n", msg);
         return;
     }
     
@@ -1416,6 +1433,60 @@ static void send_broadcast_config_response(uint8_t status) {
     send_can_send_response(&response);
 }
 
+static void send_version_query_response(uint16_t req_counter, uint32_t version) {
+    pthread_mutex_lock(&data_upload_mutex);
+    if (data_upload_socket == -1) {
+        pthread_mutex_unlock(&data_upload_mutex);
+        printf("No data client connected on port %d, cannot send version query response\n", TCP_PORT2);
+        return;
+    }
+
+    VersionQueryResponse response;
+    memset(&response, 0, sizeof(response));
+
+    response.CAN_DATA_RE_HEAD = reverse_4bytes(ACK_SYNC_WORD);
+    response.CAN_DATA_RE_LENGTH = reverse_4bytes(sizeof(response.version));
+    response.CAN_DATA_RE_COUNT = req_counter;
+    response.CAN_DATA_RE_COMMOND = htons(CMD_VERSION_QUERY);
+    response.CAN_DATA_RE_Checksum = calculate_xor_checksum(
+        (const uint8_t *)&response,
+        sizeof(response.CAN_DATA_RE_HEAD) + sizeof(response.CAN_DATA_RE_LENGTH) +
+        sizeof(response.CAN_DATA_RE_COUNT) + sizeof(response.CAN_DATA_RE_COMMOND)
+    );
+    response.version = reverse_4bytes(version);
+
+    ssize_t sent = send(data_upload_socket, &response, sizeof(response), 0);
+    if (sent != sizeof(response)) {
+        perror("Failed to send version query response");
+        close(data_upload_socket);
+        data_upload_socket = -1;
+    } else {
+        printf("Sent version query response via port %d: version=0x%08X\n", TCP_PORT2, version);
+    }
+
+    pthread_mutex_unlock(&data_upload_mutex);
+}
+
+static void handle_version_query(int sock, ReqPacket *req) {
+    (void)sock;
+
+    if (!req || reverse_4bytes(req->data_len) != sizeof(uint32_t)) {
+        send_version_query_response(req ? req->counter : 0, VERSION_QUERY_FAILED);
+        return;
+    }
+
+    uint32_t query_type = reverse_4bytes(*(uint32_t *)req->data);
+    uint32_t version = VERSION_QUERY_FAILED;
+
+    if (query_type == VERSION_QUERY_ARM) {
+        version = ARM_APP_VERSION;
+    } else if (query_type == VERSION_QUERY_FPGA) {
+        version = VERSION_QUERY_FAILED;
+    }
+
+    send_version_query_response(req->counter, version);
+}
+
 static int validate_broadcast_mask(uint32_t mask) {
     return ((mask & ~BCAST_CAN_MASK) == 0);
 }
@@ -1426,6 +1497,8 @@ static void reset_broadcast_buffers(void) {
 
         pthread_mutex_lock(&g_bcast_wake[ch].mutex);
         g_bcast_wake[ch].pending = 0;
+        g_bcast_wake[ch].armed = 0;
+        g_bcast_wake[ch].armed_until_ms = 0;
         pthread_mutex_unlock(&g_bcast_wake[ch].mutex);
     }
 }
@@ -2439,6 +2512,16 @@ static uint32_t get_broadcast_store_mask(void) {
     return mask & BCAST_CAN_MASK;
 }
 
+static uint64_t monotonic_ms(void) {
+    struct timespec ts;
+
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
+        return 0;
+    }
+
+    return (uint64_t)ts.tv_sec * 1000ULL + (uint64_t)ts.tv_nsec / 1000000ULL;
+}
+
 static void set_broadcast_rx_gate(uint8_t open) {
     pthread_mutex_lock(&bcast_rx_gate_mutex);
     g_bcast_rx_gate_open = open ? 1 : 0;
@@ -2453,6 +2536,25 @@ static int is_broadcast_rx_gate_open(void) {
     pthread_mutex_unlock(&bcast_rx_gate_mutex);
 
     return open;
+}
+
+static int is_broadcast_pps_window_open(uint8_t ch) {
+    int allowed = 0;
+
+    if (ch >= AXICAN_MAX || !is_broadcast_rx_gate_open()) {
+        return 0;
+    }
+
+    pthread_mutex_lock(&g_bcast_wake[ch].mutex);
+    if (g_bcast_wake[ch].armed && monotonic_ms() <= g_bcast_wake[ch].armed_until_ms) {
+        allowed = 1;
+    } else {
+        g_bcast_wake[ch].armed = 0;
+        g_bcast_wake[ch].armed_until_ms = 0;
+    }
+    pthread_mutex_unlock(&g_bcast_wake[ch].mutex);
+
+    return allowed;
 }
 
 static int validate_48byte_can_payload(const PC_ARM_DATA_DATA *frame) {
@@ -2511,14 +2613,11 @@ static int enqueue_broadcast_group(uint8_t target_ch, const PC_ARM_DATA_DATA *fr
         return -EINVAL;
     }
 
-    if (!is_broadcast_rx_gate_open()) {
-        printf("[BCAST] PPS receive gate closed, drop group for channel %u\n", target_ch);
-        send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, EINVAL, "broadcast receive gate closed");
+    if (!is_broadcast_pps_window_open(target_ch)) {
         return -EINVAL;
     }
 
     if (ringbuffer_32ch_avail(&g_bcast_group_buf_set, target_ch, AXICAN_MAX) == 0) {
-        send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, -ENOMEM, "broadcast channel buffer full");
         return -ENOMEM;
     }
 
@@ -2531,7 +2630,11 @@ static int enqueue_broadcast_group(uint8_t target_ch, const PC_ARM_DATA_DATA *fr
         pc_can_payload_to_axican_frame(&frames[i], &group.frames[i]);
     }
 
-    return (ringbuffer_32ch_put(&g_bcast_group_buf_set, target_ch, &group, AXICAN_MAX) == 1) ? 0 : -ENOMEM;
+    if (ringbuffer_32ch_put(&g_bcast_group_buf_set, target_ch, &group, AXICAN_MAX) != 1) {
+        return -ENOMEM;
+    }
+
+    return 0;
 }
 
 static int process_9012_can_payload_frames(const uint8_t *payload, size_t payload_len, uint32_t packet_channel) {
@@ -2668,7 +2771,6 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
                 valid_count++;
             } else {
                 error_count++;
-                send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, EINVAL, "9012 48-byte payload invalid");
             }
             offset += pkg_total_len;
             continue;
@@ -3137,8 +3239,6 @@ static void *tcp_client_handler_9009(void *client_socket) {
             break;
         }
         
-        // 9009原始报文dump较多，需要排查协议时再打开。
-        // printf("Received %zd bytes on %d\n", bytes_read, TCP_PORT1);
         
         ReqPacket *req_packet;
         ParseStatus status = parse_request_packet(buffer, bytes_read, &req_packet);
@@ -3169,6 +3269,9 @@ static void *tcp_client_handler_9009(void *client_socket) {
                 break;
             case CMD_CAN_BROADCAST_CONFIG:
                 handle_broadcast_config(sock, req_packet);
+                break;
+            case CMD_VERSION_QUERY:
+                handle_version_query(sock, req_packet);
                 break;
             default: {
                 const char *err_msg = "Unknown CAN command";
@@ -3689,187 +3792,6 @@ static void *along_data_tid_thread(void* parameter)
     printf("[CAN%d] 线程退出(running标志置为false)\n", can_id);
     return NULL;
 }
-// static void *along_data_tid_thread(void* parameter)
-// {
-//     int i, j, match_index = -1;
-//     struct axican *axican_info = (struct axican *)parameter;
-//     if (!axican_info) {  // 检查参数有效性
-//         printf("[CAN%d] 无效的axican_info参数,线程退出\n", -1);
-//         return NULL;
-//     }
-    
-//     int can_id = axican_info->id;
-//     int fd = axican_info->f_wr.fd;
-//     int flags = axican_info->f_wr.flags;
-
-    
-//     // 缓冲区数据存储
-//     PC_ARM_SIMULATOR_DATA buffer_frames[32];  // 从单机模拟缓冲区取出的数据
-//     int buffer_frame_count = 0;               // 缓冲区实际数据帧数
-    
-//     // 队列数据存储
-//     struct axican_frame dequeue_batch[DEQUEUE_BATCH_SIZE];
-//     int queue_frame_count = 0;                      // 队列实际数据帧数
-    
-//     // 回包配置参数（根据实际需求调整）
-//     const int MAX_MATCH_FRAMES = 5;  // 最大匹配帧数
-//     int required_response_frames = 0;  // 需要的回包帧数
-    
-//     /* 2. 等待单机模拟缓冲区满足条件 */
-//     while (running) {
-//         int is_single = (can_configs[can_id].can_type == ALONG_MODE);
-//         int sim_ready = (ringbuffer_32ch_len(&g_simulator_buf_set, can_id,32) >= 7);
-
-//         if (is_single && sim_ready) break;
-//         usleep(1000);
-//     }
-
-//     //从单机模拟缓冲区里面取出数据
-//     int counter = ringbuffer_32ch_len(&g_simulator_buf_set, can_id,32);
-//     printf("#############缓冲区已有 %d 帧\n", counter);
-//         // 1. 从单机模拟缓冲区取出数据并存储
-//         for(i = 0; i < counter; i++)
-//         {
-//             if (ringbuffer_32ch_get(&g_simulator_buf_set, can_id, &buffer_frames[i],32) == 1)
-//             {
-//                 printf("从单机模拟缓冲区取数据：%d\n",i+1);
-//                 buffer_frame_count++;
-//             }
-//             else
-//             {
-//                 break;
-//             }
-//         }
-//         printf("[CAN%d] 从缓冲区取出 %d 帧数据\n", can_id, buffer_frame_count);
-
-//     printf("######%d\n",running);
-//     while(running)
-//     {
-//         int data_counter = ringbuffer_32ch_len(&g_can_buf_set, can_id,6);
-//         printf("[CAN%d] 队列当前长度：%d\n", can_id, data_counter);
-//         // match_index = -1;
-//         // required_response_frames = 0;
-//         for (int i = 0; i < data_counter; i++)
-//         {
-//             queue_frame_count = ringbuffer_32ch_get(&g_can_buf_set,can_id,&dequeue_batch[i],6);
-//         }
-//         if (queue_frame_count > 0)
-//         {
-//             printf("[CAN%d] 从队列取出 %d 帧数据\n", can_id, queue_frame_count);
-//         }
-//         else if (queue_frame_count < 0)
-//         {
-//             printf("[CAN%d] 队列取出数据出错\n", can_id);
-//             usleep(10000);  // 出错时稍长休眠
-//             continue;
-//         }
-//         if (buffer_frame_count > 0 && queue_frame_count > 0)
-//         {
-//             for (int i = 0; i < queue_frame_count; i++)
-//             {
-//                 required_response_frames = 0;
-//                 struct axican_frame *current_frame = &dequeue_batch[i];
-//                 match_index = -1;
-                
-//                 // 与缓冲区中的所有数据进行对比
-//                 for (j = 0; j < buffer_frame_count; j++)
-//                 {
-//                     if (current_frame->can_id == buffer_frames[j].can_id && current_frame->data[0] == buffer_frames[j].data_type)
-//                     {
-//                         match_index = j;
-//                         printf("[CAN%d] 找到匹配帧，索引: %d\n", can_id, j);
-//                         required_response_frames = determine_response_frames(&buffer_frames[j]);
-//                         break;
-//                     }
-//                 }
-//                 // 处理匹配结果
-//                 if (match_index != -1)
-//                 {
-                    
-//                 }
-//                 //找到之后
-//             }
-//         }
-            
-
-       
-
-        
-
-
-        
-//         // 3. 处理数据：只有当两边都有数据时才进行对比
-//         // if (buffer_frame_count > 0 && queue_frame_count > 0)
-//         // {
-//         //     // 取队列的第一帧数据与缓冲区数据对比
-//         //     CanFrameNode* first_queue_frame = queue_nodes[0];
-            
-//         //     // 遍历缓冲区数据寻找匹配项
-//         //     for (j = 0; j < buffer_frame_count; j++)
-//         //     {
-//         //         // 这里根据实际数据结构实现对比逻辑
-//         //         // 示例：比较帧ID和数据长度，可根据实际需求扩展
-//         //         if (buffer_frames[j].can_id == first_queue_frame->frame.can_id &&buffer_frames[j].data_type == first_queue_frame->frame.data[0])
-//         //         {
-//         //             match_index = j;
-//         //             printf("[CAN%d] 找到匹配帧，索引: %d\n", can_id, j);
-                    
-//         //             // 根据匹配到的帧确定需要多少帧才回包
-//         //             required_response_frames = determine_response_frames(&buffer_frames[j]);
-//         //             break;
-//         //         }
-//         //     }
-            
-//         //     // 4. 如果找到匹配项，检查队列数据是否满足回包要求
-//         //     if (match_index != -1 && required_response_frames >= 0)
-//         //     {
-//         //         printf("[CAN%d] 需要 %d 帧数据进行回包\n", can_id, required_response_frames);
-                
-//         //         // 检查队列中的数据是否满足回包所需帧数
-//         //         if (queue_frame_count >= required_response_frames)
-//         //         {
-//         //             // 处理满足条件的回包数据
-         //   if (process_and_send_response(can_id, fd, flags, &buffer_frames[match_index]) == 0)
-//         //             {
-//         //                 printf("[CAN%d] 成功发送回包数据\n", can_id);
-//         //             }
-//         //             else
-//         //             {
-//         //                 printf("[CAN%d] 回包数据发送失败\n", can_id);
-//         //             }
-//         //         }
-//         //         else
-//         //         {
-//         //             printf("[CAN%d] 队列数据不足，需要 %d 帧，实际只有 %d 帧\n", 
-//         //                    can_id, required_response_frames, queue_frame_count);
-//         //             // 可选择将数据重新入队或做其他处理
-//         //             // requeue_frames(&can_queues[can_id], queue_nodes, queue_frame_count);
-//         //         }
-//         //     }
-//         //     else if (match_index == -1)
-//         //     {
-//         //         printf("[CAN%d] 未找到匹配帧，丢弃数据\n", can_id);
-
-//         //     }
-//         // }
-        
-//         // 5. 释放队列节点内存（假设节点需要手动释放）
-//         // for (i = 0; i < queue_frame_count; i++)
-//         // {
-//         //     if (queue_nodes[i])
-//         //     {
-//         //         can_queue_destroy(queue_nodes[i]);  // 释放节点内存
-//         //         queue_nodes[i] = NULL;
-//         //     }
-//         // }
-        
-//         // // 短暂休眠，避免CPU占用过高
-//         // usleep(1000);
-//     }
-    
-//     printf("[CAN%d] 单机模拟数据处理线程退出\n", can_id);
-//     return NULL;
-// }
 
 static uint32_t select_broadcast_mask_on_pps(void) {
     uint32_t mask = 0;
@@ -3917,7 +3839,22 @@ static uint32_t select_broadcast_mask_on_pps(void) {
     return mask & BCAST_CAN_MASK;
 }
 
-static void wake_broadcast_channels(uint32_t mask) {
+static void arm_broadcast_channels(uint32_t mask) {
+    uint64_t armed_until_ms = monotonic_ms() + BCAST_PPS_RX_WINDOW_MS;
+
+    for (uint8_t ch = 0; ch < AXICAN_MAX; ch++) {
+        if ((mask & (1U << ch)) == 0) {
+            continue;
+        }
+
+        pthread_mutex_lock(&g_bcast_wake[ch].mutex);
+        g_bcast_wake[ch].armed = 1;
+        g_bcast_wake[ch].armed_until_ms = armed_until_ms;
+        pthread_mutex_unlock(&g_bcast_wake[ch].mutex);
+    }
+}
+
+static void notify_broadcast_channels(uint32_t mask) {
     for (uint8_t ch = 0; ch < AXICAN_MAX; ch++) {
         if ((mask & (1U << ch)) == 0) {
             continue;
@@ -3963,13 +3900,13 @@ static void *pps_irq_thread(void *arg) {
             unsigned int irq_count = 0;
             ioctl(fd, ZMUAV_PL2PS_IRQ_GET_IRQ_COUNT, &irq_count);
 
-            reset_broadcast_buffers();
             set_broadcast_rx_gate(1);
 
             uint32_t wake_mask = select_broadcast_mask_on_pps();
             if (wake_mask != 0) {
-            // printf("[PPS] irq=%u wake broadcast mask=0x%X\n", irq_count, wake_mask);
-            wake_broadcast_channels(wake_mask);
+            printf("[PPS] irq=%u arm broadcast mask=0x%X\n", irq_count, wake_mask);
+            notify_broadcast_channels(wake_mask);
+            arm_broadcast_channels(wake_mask);
             }
         }
     }
@@ -4058,7 +3995,6 @@ static void *broadcast_can_send_thread(void *parameter) {
         BroadcastFrameGroup group;
         memset(&group, 0, sizeof(group));
         if (ringbuffer_32ch_get(&g_bcast_group_buf_set, can_id, &group, AXICAN_MAX) != 1) {
-            // printf("[BCAST] CAN%u woke but no broadcast group queued\n", can_id);
             continue;
         }
 
