@@ -1490,19 +1490,6 @@ static int validate_broadcast_mask(uint32_t mask) {
     return ((mask & ~BCAST_CAN_MASK) == 0);
 }
 
-static const char *broadcast_mode_name(uint8_t mode) {
-    switch (mode) {
-        case BCAST_MODE_SIMULTANEOUS:
-            return "simultaneous";
-        case BCAST_MODE_POLLING:
-            return "polling";
-        case BCAST_MODE_AB_ALTERNATE:
-            return "ab_alternate";
-        default:
-            return "unknown";
-    }
-}
-
 static void reset_broadcast_buffers(void) {
     for (uint8_t ch = 0; ch < AXICAN_MAX; ch++) {
         ringbuffer_32ch_reset(&g_bcast_group_buf_set, ch, AXICAN_MAX);
@@ -1579,10 +1566,9 @@ static void handle_broadcast_config(int sock, ReqPacket *req) {
 
     reset_broadcast_buffers();
 
-    printf("[BCAST CFG] enable=%u mode=%u(%s) active=0x%X A=0x%X B=0x%X start_ch=%u start_group=%u\n",
-           param->enable, param->b_mode, broadcast_mode_name(param->b_mode),
-           param->active_mask, param->group_a_mask, param->group_b_mask,
-           param->start_channel, param->start_group);
+    printf("[BCAST] config saved: enable=%u mode=%u active=0x%X A=0x%X B=0x%X start_ch=%u start_group=%u\n",
+           param->enable, param->b_mode, param->active_mask, param->group_a_mask,
+           param->group_b_mask, param->start_channel, param->start_group);
     send_broadcast_config_response(0);
 }
 
@@ -2599,7 +2585,7 @@ static int enqueue_normal_can_payload(const PC_ARM_DATA_DATA *frame) {
     uint8_t can_id = frame->ch_id;
 
     if (can_id >= AXICAN_MAX || !can_configs[can_id].valid) {
-        // printf("[9012] normal CAN channel invalid: ch=%u\n", can_id);
+        printf("[9012] normal CAN channel invalid: ch=%u\n", can_id);
         return -EINVAL;
     }
 
@@ -2618,7 +2604,7 @@ static int enqueue_broadcast_group(uint8_t target_ch, const PC_ARM_DATA_DATA *fr
     }
 
     if (target_ch >= AXICAN_MAX || !can_configs[target_ch].valid) {
-        // printf("[BCAST] invalid packet channel %u\n", target_ch);
+        printf("[BCAST] invalid packet channel %u\n", target_ch);
         send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, EINVAL, "broadcast packet channel invalid");
         return -EINVAL;
     }
@@ -2662,7 +2648,7 @@ static int process_9012_can_payload_frames(const uint8_t *payload, size_t payloa
 
     for (size_t i = 0; i < frame_count; i++) {
         if (validate_48byte_can_payload(&frames[i]) != 0) {
-            // printf("[9012] 48-byte payload invalid at index %zu\n", i);
+            printf("[9012] 48-byte payload invalid at index %zu\n", i);
             return -EINVAL;
         }
     }
@@ -2684,8 +2670,8 @@ static int process_9012_can_payload_frames(const uint8_t *payload, size_t payloa
 
     for (size_t i = 0; i < frame_count; i++) {
         if (frames[i].type != 0x02) {
-        // printf("[9012] multi 48-byte payload contains non-broadcast type 0x%02X at index %zu\n",
-        //        frames[i].type, i);
+            printf("[9012] multi 48-byte payload contains non-broadcast type 0x%02X at index %zu\n",
+                   frames[i].type, i);
             return -EINVAL;
         }
     }
@@ -2699,23 +2685,23 @@ static int process_9012_can_payload_frames(const uint8_t *payload, size_t payloa
 static void process_download_data_batch(const uint8_t *buffer, size_t total_len) {
     // 快速参数校验
     if (!buffer || total_len == 0) {
-        // printf("[9012 handler] Invalid input (buffer=%p, len=%zu)\n", buffer, total_len);
+        printf("[9012 handler] Invalid input (buffer=%p, len=%zu)\n", buffer, total_len);
         send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, -EINVAL, "invalid input");
         return;
     }
     // 步骤1：高效处理暂存区（避免溢出与冗余拷贝）
     const size_t temp_buf_max = sizeof(g_temp_buf);
     if (g_temp_len + total_len > temp_buf_max) {
-        // printf("[9012 handler] Temp buffer overflow (current=%zu, new=%zu, max=%zu)\n",
-        //        g_temp_len, total_len, temp_buf_max);
+        printf("[9012 handler] Temp buffer overflow (current=%zu, new=%zu, max=%zu)\n",
+               g_temp_len, total_len, temp_buf_max);
         // 仅保留最新数据（减少丢失窗口）
         size_t keep_len = temp_buf_max - total_len;
-        // printf("[9012 handler] Adjusting temp buffer - keep_len=%zu, discarding=%zu\n",
-        //        keep_len, g_temp_len - keep_len);
+        printf("[9012 handler] Adjusting temp buffer - keep_len=%zu, discarding=%zu\n",
+               keep_len, g_temp_len - keep_len);
         
         if (keep_len > 0 && g_temp_len > 0) {
             memmove(g_temp_buf, g_temp_buf + (g_temp_len - keep_len), keep_len);
-            // printf("[9012 handler] Moved %zu bytes to front of temp buffer\n", keep_len);
+            printf("[9012 handler] Moved %zu bytes to front of temp buffer\n", keep_len);
         }
         g_temp_len = keep_len;
         send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, -ENOMEM, "temp buffer overflow");
@@ -2752,8 +2738,8 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
 
         // 同步字校验（快速失败）
         if (req_sync_datehead != expected_sync) {
-            // printf("[9012] Sync mismatch (offset=%zu, got=0x%08X, exp=0x%08X) - skipping byte\n",
-            //        offset, req->sync_word, expected_sync);
+            printf("[9012] Sync mismatch (offset=%zu, got=0x%08X, exp=0x%08X) - skipping byte\n",
+                   offset, req->sync_word, expected_sync);
             offset++;
             error_count++;
             continue;
@@ -2764,8 +2750,8 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
                                      sizeof(req->counter) + sizeof(req->cmd_type);
         const uint32_t actual_checksum = calculate_xor_checksum(g_temp_buf + offset, checksum_len);
         if (req->checksum != actual_checksum) {
-            // printf("[9012] Checksum mismatch (offset=%zu, got=0x%08X, exp=0x%08X) - skipping packet\n",
-            //        offset, req->checksum, actual_checksum);
+            printf("[9012] Checksum mismatch (offset=%zu, got=0x%08X, exp=0x%08X) - skipping packet\n",
+                   offset, req->checksum, actual_checksum);
             offset += pkg_total_len;
             error_count++;
             continue;
@@ -2796,15 +2782,15 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
                 PC_ARM_DATA_DATA *hdr = (PC_ARM_DATA_DATA*)data_ptr;
                 
                 if (hdr->head != PC_STATUS_HEAD) {
-                    // printf("[9012] CAN inner sync invalid (offset=%zu, val=0x%08X)\n", offset, hdr->head);
+                    printf("[9012] CAN inner sync invalid (offset=%zu, val=0x%08X)\n", offset, hdr->head);
                     valid = false;
                     break;
                 }
                 
                 const uint32_t crc_range = hdr->length - sizeof(hdr->xor_checksum);
                 if (hdr->xor_checksum != calculate_xor_checksum((uint8_t*)hdr, crc_range)) {
-                    // printf("[9012] CAN inner checksum mismatch (offset=%zu, got=0x%08X)\n", 
-                    //        offset, hdr->xor_checksum);
+                    printf("[9012] CAN inner checksum mismatch (offset=%zu, got=0x%08X)\n", 
+                           offset, hdr->xor_checksum);
                     valid = false;
                     break;
                 }
@@ -2813,19 +2799,19 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
                 data_type = DATA_TYPE_CAN;
                 // 通道有效性校验
                 if (can_id >= AXICAN_MAX || !can_configs[can_id].valid) {
-                    // printf("[9012] Invalid CAN channel %d (max=%d, valid=%d)\n", 
-                    //        can_id, AXICAN_MAX, can_configs[can_id].valid);
+                    printf("[9012] Invalid CAN channel %d (max=%d, valid=%d)\n", 
+                           can_id, AXICAN_MAX, can_configs[can_id].valid);
                     valid = false;
                 }
                 break;
             }
 
             case 0x0003: { // 模拟数据
-                // printf("[9012 parser] Processing simulator data packet (offset=%zu)\n", offset);
+                printf("[9012 parser] Processing simulator data packet (offset=%zu)\n", offset);
                 PC_ARM_SIMULATOR_DATA *sim = (PC_ARM_SIMULATOR_DATA*)data_ptr;
                 
                 if (sim->head != PC_STATUS_HEAD) {
-                    // printf("sim->head:0x%08x along_data PC_STATUS_HEAD:0x%08x\n",sim->head,PC_STATUS_HEAD);
+                    printf("sim->head:0x%08x along_data PC_STATUS_HEAD:0x%08x\n",sim->head,PC_STATUS_HEAD);
                     valid = false;
                     break;
                 }
@@ -2837,23 +2823,23 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
             }
 
             case 0x0002: { // 秒脉冲数据
-                // printf("[9012 parser] Processing second pulse data (offset=%zu)\n", offset);
+                printf("[9012 parser] Processing second pulse data (offset=%zu)\n", offset);
                 can_id = 0; // 固定通道
                 data_type = DATA_TYPE_SECOND_PULSE;
                 break;
             }
 
             case 0x0005: { // DMA数据
-                // printf("[9012 parser] Processing DMA data (offset=%zu)\n", offset);
+                printf("[9012 parser] Processing DMA data (offset=%zu)\n", offset);
                 PC_DMA_DATA *dma = (PC_DMA_DATA*)data_ptr;
                 can_id = dma->DMA_CHINNEL;
                 data_type = DATA_TYPE_DMA;
-                // printf("[9012 parser] DMA data validated - channel=%d\n", can_id);
+                printf("[9012 parser] DMA data validated - channel=%d\n", can_id);
                 break;
             }
 
             default:
-                // printf("[9012] Unknown cmd_type 0x%04X (offset=%zu)\n", req_sync_datecmd, offset);
+                printf("[9012] Unknown cmd_type 0x%04X (offset=%zu)\n", req_sync_datecmd, offset);
                 valid = false;
                 break;
         }
@@ -2878,12 +2864,12 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
                     break;
                 case DATA_TYPE_SECOND_PULSE: 
                     target_buf = &g_pulse_buf_set; 
-                    // printf("[9012 queue] Target buffer: Pulse data set\n");
+                    printf("[9012 queue] Target buffer: Pulse data set\n");
                     break;
                 // DMA数据可根据需求添加对应缓冲区
                 default: 
                     valid = false; 
-                    // printf("[9012 queue] No target buffer for data type %d\n", data_type);
+                    printf("[9012 queue] No target buffer for data type %d\n", data_type);
                     break;
             }
 
@@ -2892,19 +2878,19 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
                 // 提前检查缓冲区剩余空间
                 size_t available = ringbuffer_32ch_avail(target_buf, can_id, 32);
                 if (available == 0) {
-                    // printf("[9012 queue] Buffer full (ch=%d, type=%d) - no available space\n", 
-                    //        can_id, data_type);
+                    printf("[9012 queue] Buffer full (ch=%d, type=%d) - no available space\n", 
+                           can_id, data_type);
                     send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, -ENOMEM, "buffer full");
                     error_count++;
                 } else if (ringbuffer_32ch_put(target_buf, can_id, data_ptr, 32) > 0) {
                     // printf("数据放进缓冲区\n\r");
                     valid_count++;
                 } else {
-                    // printf("[9012 queue] Failed to enqueue (ch=%d, type=%d)\n", can_id, data_type);
+                    printf("[9012 queue] Failed to enqueue (ch=%d, type=%d)\n", can_id, data_type);
                     error_count++;
                 }
             } else {
-                // printf("[9012 queue] Invalid target buffer (ch=%d, type=%d)\n", can_id, data_type);
+                printf("[9012 queue] Invalid target buffer (ch=%d, type=%d)\n", can_id, data_type);
                 error_count++;
             }
         } else {
@@ -3923,7 +3909,7 @@ static int send_broadcast_group_for_channel(uint8_t can_id, const BroadcastFrame
         return -EINVAL;
     }
     if (can_configs[can_id].state != CAN_STATE_OPENED) {
-        // printf("[BCAST] CAN%u closed, skip group %u\n", can_id, group->group_id);
+        printf("[BCAST] CAN%u closed, skip group %u\n", can_id, group->group_id);
         return -EINVAL;
     }
 
@@ -3942,8 +3928,8 @@ static int send_broadcast_group_for_channel(uint8_t can_id, const BroadcastFrame
         pthread_mutex_unlock(&can_write_mutex[can_id]);
 
         if (rc != sizeof(struct axican_frame)) {
-            // printf("[BCAST] CAN%u send group %u frame %u failed: %d/%zu\n",
-            //        can_id, group->group_id, i, rc, sizeof(struct axican_frame));
+            printf("[BCAST] CAN%u send group %u frame %u failed: %d/%zu\n",
+                   can_id, group->group_id, i, rc, sizeof(struct axican_frame));
             send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, errno, "broadcast CAN send failed");
             return -EIO;
         }
@@ -3967,7 +3953,7 @@ static void *broadcast_can_send_thread(void *parameter) {
     // 广播优先级高于普通发送(80)，低于 TX 监控(99)。
     param_a.sched_priority = 90;
     if (pthread_setschedparam(tid, SCHED_FIFO, &param_a) != 0) {
-        // printf("[BCAST] CAN%u set priority failed: %s\n", can_id, strerror(errno));
+        printf("[BCAST] CAN%u set priority failed: %s\n", can_id, strerror(errno));
     }
 
     while (running) {
@@ -3989,8 +3975,8 @@ static void *broadcast_can_send_thread(void *parameter) {
         BroadcastFrameGroup group;
         memset(&group, 0, sizeof(group));
         uint32_t get_ret = ringbuffer_32ch_get(&g_bcast_group_buf_set, can_id, &group, AXICAN_MAX);
-        printf("[BCAST TX] CAN%u get=%u remaining=%u\n",
-               can_id, get_ret, ringbuffer_32ch_avail(&g_bcast_group_buf_set, can_id, AXICAN_MAX));
+        // printf("[BCAST TX] CAN%u get=%u remaining=%u\n",
+        //        can_id, get_ret, ringbuffer_32ch_avail(&g_bcast_group_buf_set, can_id, AXICAN_MAX));
         if (get_ret != 1) {
             continue;
         }
@@ -3998,7 +3984,7 @@ static void *broadcast_can_send_thread(void *parameter) {
         send_broadcast_group_for_channel(can_id, &group);
     }
 
-    // printf("[BCAST] CAN%u broadcast thread exited\n", can_id);
+    printf("[BCAST] CAN%u broadcast thread exited\n", can_id);
     return NULL;
 }
 
@@ -4082,8 +4068,6 @@ static void *CAN_byte_thread(void *arg) {
     
 }
 static void *buffer_report_thread(void *arg) {
-    uint32_t bcast_buf_print_counter = 0;
-
     usleep(5000000);  // 初始延迟5秒
     while (running) {
         /* 构造应答包（栈变量即可） */
@@ -4128,16 +4112,6 @@ static void *buffer_report_thread(void *arg) {
             curr_ch->dmaddr_space=0xFFFFFFFF;
             curr_ch->vfifo_space=0xFFFFFFFF;
             curr_ch->axififo_space=0xFFFFFFFF;
-        }
-
-        bcast_buf_print_counter++;
-        if (bcast_buf_print_counter >= 2000) {
-            bcast_buf_print_counter = 0;
-            printf("[BCAST BUF] remaining:");
-            for (uint8_t ch = 0; ch < AXICAN_MAX; ch++) {
-                printf(" CAN%u=%u", ch, upload_data.channels[ch].pulse_buf_remaining);
-            }
-            printf("\n");
         }
         
         for (uint8_t ch = AXICAN_MAX; ch < MAX_CHANNELS; ch++) {
