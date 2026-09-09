@@ -13,6 +13,7 @@
 #include <pthread.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -52,6 +53,9 @@
 #define MAX_CLIENTS 5
 #define BUFFER_SIZE 4096
 #define BUFFER_SIZE_1 1048628
+#define TCP_KEEPALIVE_IDLE_SEC 60
+#define TCP_KEEPALIVE_INTERVAL_SEC 10
+#define TCP_KEEPALIVE_PROBES 3
 #define SIMULATOR_BUFFER_SIZE 1000  // 单机模拟缓冲区大小
 //启动和关闭CAN功能
 #define OPEN_CAN_DEVICE 0xAA
@@ -104,6 +108,48 @@ static int common_data = -1;
 
 uint32_t channel_frame_count[6] = {0};
 static volatile int running = 1;
+
+/*
+ * Configure only the TCP connection health checks.  This does not change the
+ * CAN protocol or data-flow logic.  Keepalive allows a blocked recv() to
+ * notice a peer which disappeared without sending FIN/RST.
+ */
+static void configure_tcp_keepalive(int sock, int port)
+{
+    int enabled = 1;
+    int idle = TCP_KEEPALIVE_IDLE_SEC;
+    int interval = TCP_KEEPALIVE_INTERVAL_SEC;
+    int probes = TCP_KEEPALIVE_PROBES;
+
+    if (setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE,
+                   &enabled, sizeof(enabled)) < 0) {
+        fprintf(stderr, "TCP keepalive enable failed on port %d: %s\n",
+                port, strerror(errno));
+        return;
+    }
+
+#ifdef TCP_KEEPIDLE
+    if (setsockopt(sock, IPPROTO_TCP, TCP_KEEPIDLE,
+                   &idle, sizeof(idle)) < 0) {
+        fprintf(stderr, "TCP keepalive idle setup failed on port %d: %s\n",
+                port, strerror(errno));
+    }
+#endif
+#ifdef TCP_KEEPINTVL
+    if (setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL,
+                   &interval, sizeof(interval)) < 0) {
+        fprintf(stderr, "TCP keepalive interval setup failed on port %d: %s\n",
+                port, strerror(errno));
+    }
+#endif
+#ifdef TCP_KEEPCNT
+    if (setsockopt(sock, IPPROTO_TCP, TCP_KEEPCNT,
+                   &probes, sizeof(probes)) < 0) {
+        fprintf(stderr, "TCP keepalive probe setup failed on port %d: %s\n",
+                port, strerror(errno));
+    }
+#endif
+}
 
 //单机模拟计数器（判断需要多少次中断）
 static pthread_mutex_t along_counter_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -2920,6 +2966,8 @@ static void *tcp_client_handler_9012(void *client_socket) {
     free(client_socket);
     uint8_t buffer[BUFFER_SIZE_1];
     ssize_t bytes_read;
+
+    configure_tcp_keepalive(sock, DATA_DOWNLOAD_PORT);
     
     printf("New data download client connected on port %d, socket: %d\n", 
            DATA_DOWNLOAD_PORT, sock);
@@ -3026,6 +3074,8 @@ static void *tcp_listen_thread_9012(void *port_ptr) {
 static void *tcp_client_handler_9010(void *client_socket) {
     int sock = *(int *)client_socket;
     free(client_socket);
+
+    configure_tcp_keepalive(sock, TCP_PORT2);
     
     printf("New data upload client connected on port %d, socket: %d\n", TCP_PORT2, sock);
     
@@ -3123,6 +3173,8 @@ static void *tcp_listen_thread_9010(void *port_ptr) {
 static void *tcp_client_handler_9011(void *client_socket) {
     int sock = *(int *)client_socket;
     free(client_socket);
+
+    configure_tcp_keepalive(sock, TCP_PORT3);
     
     printf("New event client connected on port %d, socket: %d\n", TCP_PORT3, sock);
     
@@ -3222,6 +3274,8 @@ static void *tcp_client_handler_9009(void *client_socket) {
     free(client_socket);
     uint8_t buffer[BUFFER_SIZE];
     ssize_t bytes_read;
+
+    configure_tcp_keepalive(sock, TCP_PORT1);
     
     printf("New CAN command client connected on port %d, socket: %d\n", TCP_PORT1, sock);
     
@@ -3279,7 +3333,7 @@ static void *tcp_client_handler_9009(void *client_socket) {
         }
     }
     
-    // printf("CAN command client disconnected on port %d, socket: %d\n", TCP_PORT1, sock);
+    printf("CAN command client disconnected on port %d, socket: %d\n", TCP_PORT1, sock);
     close(sock);
     return NULL;
 }
@@ -4184,6 +4238,9 @@ int main(void) {
     int ports[4] = {TCP_PORT1, TCP_PORT2, TCP_PORT3, TCP_PORT4};
     unsigned int baud, mode;
     int pps_thread_started = 0;
+
+    /* Keep a peer disconnect from terminating the whole CAN/TCP process. */
+    signal(SIGPIPE, SIG_IGN);
     
     // signal(SIGINT, sigint_handler);
     // signal(SIGTERM, sigint_handler);

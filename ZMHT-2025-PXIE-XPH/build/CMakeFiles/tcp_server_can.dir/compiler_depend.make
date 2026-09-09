@@ -487,6 +487,7 @@ CMakeFiles/tcp_server_can.dir/src/main18.c.o: ../src/main18.c \
   /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/include/bits/types/struct_osockaddr.h \
   /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/include/netinet/in.h \
   /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/include/bits/in.h \
+  /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/include/netinet/tcp.h \
   /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/include/arpa/inet.h \
   /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/include/stdbool.h \
   ../src/axican/axican.h \
@@ -579,6 +580,8 @@ CMakeFiles/tcp_server_can.dir/src/ringbuffer_channels.c.o: ../src/ringbuffer_cha
 ../src/ringbuffer_channels.h:
 
 /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/include/stdbool.h:
+
+/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/arm-linux-gnueabihf/libc/usr/include/netinet/tcp.h:
 
 ../src/flashcp.h:
 
