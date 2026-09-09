@@ -11,6 +11,9 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <sched.h>
+#include <sys/resource.h>
+#include <sys/syscall.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -108,6 +111,36 @@ static int common_data = -1;
 
 uint32_t channel_frame_count[6] = {0};
 static volatile int running = 1;
+
+/* 普通分时调度；TX 监控用 nice=-2 稍微提高 CPU 权重，避免实时线程饿死网络。 */
+static void can_use_normal_sched(int can_id, const char *name, int nice_value)
+{
+    struct sched_param param = {0};
+    char label[64];
+    pid_t tid = (pid_t)syscall(SYS_gettid);
+
+    if (can_id >= 0) {
+        snprintf(label, sizeof(label), "CAN%d %s", can_id, name);
+    } else {
+        snprintf(label, sizeof(label), "%s", name);
+    }
+
+    int ret = pthread_setschedparam(pthread_self(), SCHED_OTHER, &param);
+    if (ret != 0) {
+        fprintf(stderr, "[%s] TID=%ld set SCHED_OTHER failed: %s\n",
+                label, (long)tid, strerror(ret));
+        return;
+    }
+
+    /* Linux 的 nice 按线程生效，使用内核 TID，不能使用 pthread_self()。 */
+    if (setpriority(PRIO_PROCESS, (id_t)tid, nice_value) != 0) {
+        fprintf(stderr, "[%s] TID=%ld SCHED_OTHER active, set nice=%d failed: %s\n",
+                label, (long)tid, nice_value, strerror(errno));
+        return;
+    }
+
+    printf("[%s] TID=%ld SCHED_OTHER nice=%d\n", label, (long)tid, nice_value);
+}
 
 /*
  * Configure only the TCP connection health checks.  This does not change the
@@ -2174,26 +2207,17 @@ static void *axican_data_recv_thread(void* parameter) {
     // 假设fourByteFrames的定义和使用在handle_along_mode中有说明
 
     cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
     CPU_SET(1, &cpuset);    
     pthread_t tid = pthread_self();
     int rc_c = pthread_setaffinity_np(tid, sizeof(cpu_set_t), &cpuset);
     if (rc_c != 0) {
-        printf("[CAN%d] 设置CPU亲和性失败: %d\n", can_id, rc);
+        printf("[CAN%d] 设置CPU亲和性失败: %d\n", can_id, rc_c);
     } else {
        // printf("[CAN%d] 线程已绑定到CPU核心: %d\n", can_id, can_id % sysconf(_SC_NPROCESSORS_ONLN));
     }
     
-    // 设置线程优先级
-    struct sched_param param_a;
-    param_a.sched_priority = 60;  // 优先级值(1-99，值越大优先级越高)
-    
-    // 使用实时调度策略(SCHED_FIFO)
-    rc_c = pthread_setschedparam(tid, SCHED_FIFO, &param_a);
-    if (rc_c != 0) {
-        printf("[CAN%d] 设置线程优先级失败: %d\n", can_id, rc);
-    } else {
-       // printf("[CAN%d] 线程优先级已设置为: %d\n", can_id, param_a.sched_priority);
-    }
+    can_use_normal_sched(can_id, "RX", 0);
 
     printf("###### %s axican id:%d ######## \n", __func__, axican_info->id);
     // 参数合法性检查（避免空指针崩溃）
@@ -2353,15 +2377,7 @@ static void *axican_data_send_thread(void* parameter) {
     uint32_t elem_size = sizeof(PC_ARM_DATA_DATA);
     PC_ARM_DATA_DATA curr_frame;  // 单帧数据缓冲区
 
-    // 普通发送优先级低于广播发送和 TX 监控。
-    struct sched_param normal_param;
-    memset(&normal_param, 0, sizeof(normal_param));
-    normal_param.sched_priority = 80;
-    int sched_rc = pthread_setschedparam(pthread_self(), SCHED_FIFO, &normal_param);
-    if (sched_rc != 0) {
-        fprintf(stderr, "[CAN%d NORMAL TX] 设置SCHED_FIFO优先级80失败: %s\n",
-                can_id, strerror(sched_rc));
-    }
+    can_use_normal_sched(can_id, "TX", 0);
 
 
     // 检查缓冲区初始化状态
@@ -3413,6 +3429,7 @@ static void* axican_data_process_thread_1(void* parameter)
     free(parameter);
 
     cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
     CPU_SET(1, &cpuset);    
     pthread_t tid = pthread_self();
     int rc_c = pthread_setaffinity_np(tid, sizeof(cpu_set_t), &cpuset);
@@ -3422,17 +3439,7 @@ static void* axican_data_process_thread_1(void* parameter)
        // printf("[CAN%d] 线程已绑定到CPU核心: %d\n", can_id, can_id % sysconf(_SC_NPROCESSORS_ONLN));
     }
     
-    // 设置线程优先级
-    struct sched_param param_a;
-    param_a.sched_priority = 80;  // 优先级值(1-99，值越大优先级越高)
-    
-    // 使用实时调度策略(SCHED_FIFO)
-    rc_c = pthread_setschedparam(tid, SCHED_FIFO, &param_a);
-    if (rc_c != 0) {
-        printf("[CAN%d] 设置线程优先级失败: %d\n", can_id, rc_c);
-    } else {
-        //printf("[CAN%d] 线程优先级已设置为: %d\n", can_id, param_a.sched_priority);
-    }
+    can_use_normal_sched(can_id, "TX REPORT", 0);
     
     // 批量处理配置
     struct axican_frame dequeue_batch[DEQUEUE_BATCH_SIZE];  // 从缓冲区读取的帧数组
@@ -3505,6 +3512,8 @@ static void* axican_data_process_thread(void* parameter)
     // 获取CAN通道ID并释放参数内存
     int can_id = *(int*)parameter;
     free(parameter);
+
+    can_use_normal_sched(can_id, "RX REPORT", 0);
     
     // 批量处理配置
     struct axican_frame dequeue_batch[DEQUEUE_BATCH_SIZE];  // 从缓冲区读取的帧数组
@@ -3624,6 +3633,8 @@ static void *along_data_tid_thread(void* parameter)
     int can_id = axican_info->id;
     int fd = axican_info->f_wr.fd;
     int flags = axican_info->f_wr.flags;
+
+    can_use_normal_sched(can_id, "SIMULATOR", 0);
 
     // 2. 数据存储区定义
     // 2.1 单机模拟缓冲区数据（预加载，固定32帧上限）
@@ -4002,13 +4013,7 @@ static void *broadcast_can_send_thread(void *parameter) {
     }
 
     uint8_t can_id = axican_info->id;
-    pthread_t tid = pthread_self();
-    struct sched_param param_a;
-    // 广播优先级高于普通发送(80)，低于 TX 监控(99)。
-    param_a.sched_priority = 90;
-    if (pthread_setschedparam(tid, SCHED_FIFO, &param_a) != 0) {
-        printf("[BCAST] CAN%u set priority failed: %s\n", can_id, strerror(errno));
-    }
+    can_use_normal_sched(can_id, "BCAST", 0);
 
     while (running) {
         pthread_mutex_lock(&g_bcast_wake[can_id].mutex);
@@ -4069,28 +4074,15 @@ static void *send_data_tid_thread(void* parameter)
         printf("[CAN%d TX监控] 已绑定CPU%d\n", can_id, target_cpu);
     }
 
-    // TX 监控队列需要及时排空，避免驱动发送 FIFO 积压后反压普通发送。
-    // SCHED_FIFO 需要 root 或 CAP_SYS_NICE；设置失败时继续以普通调度策略运行。
-    pthread_t tid = pthread_self();
-    struct sched_param monitor_param;
-    memset(&monitor_param, 0, sizeof(monitor_param));
-    monitor_param.sched_priority = sched_get_priority_max(SCHED_FIFO);
-    int sched_rc = pthread_setschedparam(tid, SCHED_FIFO, &monitor_param);
-    if (sched_rc != 0) {
-        fprintf(stderr,
-                "[CAN%d TX监控] 设置SCHED_FIFO最高优先级失败: %s\n",
-                can_id, strerror(sched_rc));
-    } else {
-        printf("[CAN%d TX监控] SCHED_FIFO优先级已设置为%d\n",
-               can_id, monitor_param.sched_priority);
-    }
+    // 监控比其他 CAN 线程稍高，但仍由普通调度器分配 CPU 时间。
+    can_use_normal_sched(can_id, "TX MONITOR", -2);
 
     // 复用帧缓冲区（避免栈上重复分配）
     struct axican_frame recv_frame;
     memset(&recv_frame, 0, sizeof(struct axican_frame));
     while (running) {
         
-        // 非阻塞轮询（超时时间短，提高响应速度）
+        // 等待驱动就绪，POLL_TIMEOUT_MS=-1 表示无限等待。
         int rc = axican_poll2(fd, flags, POLL_TIMEOUT_MS);
         
         // 无论是否有数据，都尝试读取（axican_read_data_t内部会检查帧数量）
@@ -4101,8 +4093,7 @@ static void *send_data_tid_thread(void* parameter)
                 fprintf(stderr, "[CAN%d] 读取错误 (code: %d)\n", can_id, read_count);
             }
             axican_info->count += read_count;
-            // POLLOUT 在设备可写时可能持续就绪。99级实时线程空转会
-            // 饿死广播/普通发送线程，因此无监控帧时主动让出 CPU。
+            // POLLOUT 在设备可写时可能持续就绪，无监控帧时休眠避免空转。
             if (read_count == 0) {
                 usleep(100);
             }
@@ -4238,6 +4229,9 @@ int main(void) {
     int ports[4] = {TCP_PORT1, TCP_PORT2, TCP_PORT3, TCP_PORT4};
     unsigned int baud, mode;
     int pps_thread_started = 0;
+
+    // 先重置创建者的调度，TCP 监听/连接、上报及 PPS 线程继承普通调度。
+    can_use_normal_sched(-1, "CAN MAIN", 0);
 
     /* Keep a peer disconnect from terminating the whole CAN/TCP process. */
     signal(SIGPIPE, SIG_IGN);
