@@ -1,8 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o"
   "CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o.d"
-  "CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o"
-  "CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o.d"
   "CMakeFiles/tcp_server_can.dir/src/flashcp.c.o"
   "CMakeFiles/tcp_server_can.dir/src/flashcp.c.o.d"
   "CMakeFiles/tcp_server_can.dir/src/main18.c.o"

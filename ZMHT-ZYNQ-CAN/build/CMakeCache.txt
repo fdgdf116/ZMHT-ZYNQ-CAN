@@ -14,6 +14,9 @@
 # EXTERNAL cache entries
 ########################
 
+//ARM program type: 1=CAN, 2=CANFD
+ARM_PROGRAM_TYPE:STRING=1
+
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-addr2line
 
@@ -217,6 +220,8 @@ zynq_can_test_SOURCE_DIR:STATIC=/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZY
 # INTERNAL cache entries
 ########################
 
+//STRINGS property for variable: ARM_PROGRAM_TYPE
+ARM_PROGRAM_TYPE-STRINGS:INTERNAL=1;2
 //ADVANCED property for variable: CMAKE_ADDR2LINE
 CMAKE_ADDR2LINE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_AR

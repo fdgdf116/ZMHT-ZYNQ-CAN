@@ -97,24 +97,10 @@ CMakeFiles/tcp_server_can.dir/src/ringbuffer_channels.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/tcp_server_can.dir/src/ringbuffer_channels.c.s"
 	/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/ringbuffer_channels.c -o CMakeFiles/tcp_server_can.dir/src/ringbuffer_channels.c.s
 
-CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o: CMakeFiles/tcp_server_can.dir/flags.make
-CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o: ../src/can_frame_queue.c
-CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o: CMakeFiles/tcp_server_can.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o"
-	/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o -MF CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o.d -o CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o -c /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/can_frame_queue.c
-
-CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.i"
-	/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/can_frame_queue.c > CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.i
-
-CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.s"
-	/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/can_frame_queue.c -o CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.s
-
 CMakeFiles/tcp_server_can.dir/src/flashcp.c.o: CMakeFiles/tcp_server_can.dir/flags.make
 CMakeFiles/tcp_server_can.dir/src/flashcp.c.o: ../src/flashcp.c
 CMakeFiles/tcp_server_can.dir/src/flashcp.c.o: CMakeFiles/tcp_server_can.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/tcp_server_can.dir/src/flashcp.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/tcp_server_can.dir/src/flashcp.c.o"
 	/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tcp_server_can.dir/src/flashcp.c.o -MF CMakeFiles/tcp_server_can.dir/src/flashcp.c.o.d -o CMakeFiles/tcp_server_can.dir/src/flashcp.c.o -c /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/flashcp.c
 
 CMakeFiles/tcp_server_can.dir/src/flashcp.c.i: cmake_force
@@ -128,7 +114,7 @@ CMakeFiles/tcp_server_can.dir/src/flashcp.c.s: cmake_force
 CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o: CMakeFiles/tcp_server_can.dir/flags.make
 CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o: ../src/axican/axican.c
 CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o: CMakeFiles/tcp_server_can.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o"
 	/home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o -MF CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o.d -o CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o -c /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/axican/axican.c
 
 CMakeFiles/tcp_server_can.dir/src/axican/axican.c.i: cmake_force
@@ -143,7 +129,6 @@ CMakeFiles/tcp_server_can.dir/src/axican/axican.c.s: cmake_force
 tcp_server_can_OBJECTS = \
 "CMakeFiles/tcp_server_can.dir/src/main18.c.o" \
 "CMakeFiles/tcp_server_can.dir/src/ringbuffer_channels.c.o" \
-"CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o" \
 "CMakeFiles/tcp_server_can.dir/src/flashcp.c.o" \
 "CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o"
 
@@ -152,12 +137,11 @@ tcp_server_can_EXTERNAL_OBJECTS =
 
 tcp_server_can: CMakeFiles/tcp_server_can.dir/src/main18.c.o
 tcp_server_can: CMakeFiles/tcp_server_can.dir/src/ringbuffer_channels.c.o
-tcp_server_can: CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o
 tcp_server_can: CMakeFiles/tcp_server_can.dir/src/flashcp.c.o
 tcp_server_can: CMakeFiles/tcp_server_can.dir/src/axican/axican.c.o
 tcp_server_can: CMakeFiles/tcp_server_can.dir/build.make
 tcp_server_can: CMakeFiles/tcp_server_can.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking C executable tcp_server_can"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable tcp_server_can"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/tcp_server_can.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

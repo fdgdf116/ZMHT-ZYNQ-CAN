@@ -140,7 +140,5 @@ CMakeFiles/tcp_server_can.dir/src/main18.c.o: \
  /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/7.2.1/include/stdbool.h \
  /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/axican/axican.h \
  /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/axican/zmuav_axican.h \
- /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/can_frame_queue.h \
- /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/axican/zmuav_axican.h \
  /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/ringbuffer_channels.h \
  /home/wang/ZMHT-Project/ZMHT-ZYNQ-地检/ZMHT-ZYNQ-CAN/src/zmuav_pl2ps_irq.h

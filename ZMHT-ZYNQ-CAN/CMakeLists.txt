@@ -1,7 +1,7 @@
 #指定cmake 最低版本
 cmake_minimum_required(VERSION 3.10)
 
-# 指定交叉编译器（aarch64 架构，64位 ARM）
+# 指定交叉编译器（32 位 ARM hard-float）
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 set(CMAKE_C_COMPILER /home/wang/ZMHT-Tool/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-gcc)
@@ -43,10 +43,10 @@ link_directories(
 
 # 用户态程序源码。不要用 aux_source_directory 自动收集整个 src，
 # 因为 src/zmuav_pl2ps_irq.c 是 Linux 内核模块源码，不能编进用户态程序。
+# can_frame_queue.c 为未使用的旧链表队列实现，保留源码但不再编入程序。
 set(DIR_SRCS
     src/main18.c
     src/ringbuffer_channels.c
-    src/can_frame_queue.c
     src/flashcp.c
 )
 

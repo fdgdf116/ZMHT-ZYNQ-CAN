@@ -153,30 +153,6 @@ src/axican/axican.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tcp_server_can.dir/build.make CMakeFiles/tcp_server_can.dir/src/axican/axican.c.s
 .PHONY : src/axican/axican.c.s
 
-src/can_frame_queue.o: src/can_frame_queue.c.o
-.PHONY : src/can_frame_queue.o
-
-# target to build an object file
-src/can_frame_queue.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tcp_server_can.dir/build.make CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.o
-.PHONY : src/can_frame_queue.c.o
-
-src/can_frame_queue.i: src/can_frame_queue.c.i
-.PHONY : src/can_frame_queue.i
-
-# target to preprocess a source file
-src/can_frame_queue.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tcp_server_can.dir/build.make CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.i
-.PHONY : src/can_frame_queue.c.i
-
-src/can_frame_queue.s: src/can_frame_queue.c.s
-.PHONY : src/can_frame_queue.s
-
-# target to generate assembly for a file
-src/can_frame_queue.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tcp_server_can.dir/build.make CMakeFiles/tcp_server_can.dir/src/can_frame_queue.c.s
-.PHONY : src/can_frame_queue.c.s
-
 src/flashcp.o: src/flashcp.c.o
 .PHONY : src/flashcp.o
 
@@ -261,9 +237,6 @@ help:
 	@echo "... src/axican/axican.o"
 	@echo "... src/axican/axican.i"
 	@echo "... src/axican/axican.s"
-	@echo "... src/can_frame_queue.o"
-	@echo "... src/can_frame_queue.i"
-	@echo "... src/can_frame_queue.s"
 	@echo "... src/flashcp.o"
 	@echo "... src/flashcp.i"
 	@echo "... src/flashcp.s"

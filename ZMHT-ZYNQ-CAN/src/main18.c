@@ -22,7 +22,6 @@
 #include <stdbool.h>
 
 #include "axican.h"
-#include "can_frame_queue.h"
 #include "ringbuffer_channels.h"
 #include "zmuav_pl2ps_irq.h"
 
@@ -74,14 +73,25 @@
 #define ARM_APP_VERSION 0x20260701UL
 #define VERSION_QUERY_ARM 0xAA
 #define VERSION_QUERY_FPGA 0xBB
+#define VERSION_QUERY_ARM_PROGRAM 0xAC
 #define VERSION_QUERY_FAILED 0xFFFFFFFFUL
+
+/* ARM 程序类型：用于区分普通 CAN 与 CAN FD 版本。 */
+#define ARM_PROGRAM_CAN   1U
+#define ARM_PROGRAM_CANFD 2U
+
+/* 当前固件固定为普通 CAN 版本。CAN FD 版本只需改为 ARM_PROGRAM_CANFD。 */
+#define ARM_PROGRAM_TYPE ARM_PROGRAM_CAN
+
+#if (ARM_PROGRAM_TYPE != ARM_PROGRAM_CAN) && (ARM_PROGRAM_TYPE != ARM_PROGRAM_CANFD)
+#error "ARM_PROGRAM_TYPE must be ARM_PROGRAM_CAN (1) or ARM_PROGRAM_CANFD (2)"
+#endif
 
 //宏定义
 #define CAN_FIFO_TWO_FRAME_SIZE (16)
 #define CAN_FIFO_THR_FRAME_SIZE  (4)
 #define DEQUEUE_BATCH_SIZE 32
 #define DEQUEUE_BATCH_SIZE_1 10
-#define CAN_QUEUE_MAX_SIZE 10000
 #define POLL_TIMEOUT_MS -1
 #define CAN_FRAME_DATA_LEN 16
 //用于分包校验是否连续，如果不连续则丢弃，连续则发送
@@ -702,7 +712,8 @@ typedef enum {
     PARSE_SUCCESS,
     PARSE_ERR_SYNC,
     PARSE_ERR_LEN,
-    PARSE_ERR_CHECKSUM
+    PARSE_ERR_CHECKSUM,
+    PARSE_NEED_MORE
     
 } ParseStatus;
 //用来存储接收到的CAN帧
@@ -719,10 +730,6 @@ typedef struct {
 } PacketBuffer;
 
 
-//全局缓存队列，为每个CAN通道创建一个队列
-CanFrameQueue can_queues[AXICAN_MAX];
-CanFrameQueue can_queues_1[AXICAN_MAX];
-
 // 全局变量初始化
 static BufferManager g_buf_mgr; //全局管理器实例（程序唯一）
 CanDeviceConfig can_configs[AXICAN_MAX] = {0};
@@ -730,17 +737,20 @@ CanQueryResp resp[AXICAN_MAX];
 CanBufferState can_buffers[MAX_CHANNELS][DATA_TYPE_MAX];
 static PacketBuffer packet_buffers[AXICAN_MAX] = {0};
 
-uint8_t g_temp_buf[BUFFER_SIZE_1 * 2];  // 暂存不完整数据包（最大支持2个BUFFER_SIZE长度）
-uint32_t g_temp_len = 0; // 暂存区当前数据长度
+/* 每条下载连接独占半包缓存；保持原来的最大缓存容量。 */
+typedef struct {
+    size_t used;
+    uint8_t bytes[BUFFER_SIZE_1 * 2];
+} DownloadStream;
+/* 串行化连接替换与入队，旧连接只允许完成替换之前的当前批次。 */
+static pthread_mutex_t download_process_mutex = PTHREAD_MUTEX_INITIALIZER;
 uint8_t  can_data_type=0;            
 
 static uint32_t g_tcp_buffer_total = BUFFER_SIZE_1;  // 初始值为BUFFER_SIZE
 static uint32_t g_tcp_buffer_used = 0;
 static pthread_mutex_t tcp_buffer_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-RingBuffer32ChSet g_simulator_buf_set;
-RingBuffer32ChSet g_data_buf_set;
-RingBuffer32ChSet g_pulse_buf_set;
+/* 核心、模拟器、秒脉冲缓冲区由 ringbuffer_channels.c 定义。 */
 //创建队列结构体的数据
 RingBuffer32ChSet g_can_buf_set;
 //创建监控队列结构 
@@ -750,6 +760,10 @@ RingBuffer32ChSet g_bcast_group_buf_set;
 
 static BroadcastSchedulerConfig g_bcast_cfg = {0};
 static pthread_mutex_t bcast_cfg_mutex = PTHREAD_MUTEX_INITIALIZER;
+/* 广播状态事务锁：配置/重置、PPS、入队、领取唤醒并出队、容量查询。
+ * 顺序：state -> cfg/rx_gate/group_id/wake；禁止持 wake 再获取 state。
+ * CAN write 和网络应答均在释放 state 后执行，避免阻塞六路广播。 */
+static pthread_mutex_t bcast_state_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t can_write_mutex[AXICAN_MAX];
 static BroadcastChannelWake g_bcast_wake[AXICAN_MAX];
 static uint32_t g_bcast_group_id = 0;
@@ -770,6 +784,7 @@ static void handle_version_query(int sock, ReqPacket *req);
 static int process_9012_can_payload_frames(const uint8_t *payload, size_t payload_len, uint32_t packet_channel);
 static void *pps_irq_thread(void *arg);
 static void *broadcast_can_send_thread(void *parameter);
+static uint32_t broadcast_buffer_available(uint8_t ch);
 
 uint16_t reverse_2bytes(uint16_t value) {
     return ((value & 0x00FF) << 8) |  // 低8位移到高8位
@@ -883,7 +898,10 @@ static uint32_t calculate_xor_checksum(const uint8_t *data, uint32_t len) {
     for (uint32_t i = 0; i < len; i += 4)
     {
 
-        res ^= *(uint32_t*)(data + i);
+        uint32_t word = 0;
+        size_t remaining = len - i;
+        memcpy(&word, data + i, remaining < sizeof(word) ? remaining : sizeof(word));
+        res ^= word;
        //printf("Byte %u (0x%08X), XOR sum: 0x%08X\n\r", i, data[i], res);
     }
     // for (uint32_t i = 0; i < len; i++) {
@@ -1022,7 +1040,7 @@ static void send_can_info_response(CanConfigParam *devices, uint8_t total_count)
     
     // 计算需要的大小 - 使用实际传入的total_count而非固定的AXICAN_MAX
     size_t response_size = sizeof(CAN_Send_Response_r) + (total_count * sizeof(CanConfigParam));
-    printf("CAN SEND: %d,config:%d,sizeof(CanConfigParam):%d",sizeof(CAN_Send_Response_r),(total_count * sizeof(CanConfigParam)),sizeof(CanConfigParam));
+    printf("CAN SEND: %zu,config:%zu,sizeof(CanConfigParam):%zu\n",sizeof(CAN_Send_Response_r),(total_count * sizeof(CanConfigParam)),sizeof(CanConfigParam));
     // 开辟空间，分配内存
     CAN_Send_Response_r *response = malloc(response_size);
     if (!response) {
@@ -1054,7 +1072,7 @@ static void send_can_info_response(CanConfigParam *devices, uint8_t total_count)
     // 打印发送的数据内容（调试用）
     printf("=== 发送的CAN响应数据 ===\n");
     printf("头部: 0x%X\n", response->CAN_DATA_RE_HEAD);
-    printf("长度: %zu\n", response->CAN_DATA_RE_LENGTH);
+    printf("长度: %u\n", response->CAN_DATA_RE_LENGTH);
     printf("计数器: %d\n", response->CAN_DATA_RE_COUNT);
     printf("命令: 0x%X\n", response->CAN_DATA_RE_COMMOND);
     printf("校验和: 0x%X\n", response->CAN_DATA_RE_Checksum);
@@ -1174,11 +1192,6 @@ void destroy_all_ring_buffers(void) {
 
     // 销毁每通道广播组缓冲区
     ringbuffer_32ch_destory(&g_bcast_group_buf_set, 6);
-    
-    // 销毁CAN队列
-    for (int i = 0; i < AXICAN_MAX; i++) {
-        can_queue_destroy(&can_queues[i]);  // 假设存在对应的队列销毁函数
-    }
     
     printf("所有环形缓冲区已销毁\n");
 }
@@ -1385,8 +1398,8 @@ static void handle_can_info_query(int sock, ReqPacket *req) {
         can_mage_return_t->total_count = (data_counter == 0xFFFFFFFF) ? 0 : data_counter + 1;
         channel_frame_count[curr_cfg->can_id] = (channel_frame_count[curr_cfg->can_id] == 0xFFFFFFFF) ? 0 : channel_frame_count[curr_cfg->can_id] + 1;
         can_mage_return_t->ch_count = channel_frame_count[curr_cfg->can_id];
-        can_mage_return_t->baud_rate = can_configs->baud_rate;
-        can_mage_return_t->mode = can_configs->mode;
+        can_mage_return_t->baud_rate = curr_cfg->baud_rate;
+        can_mage_return_t->mode = curr_cfg->mode;
         can_mage_return_t->auto_send = 0x1;
         can_mage_return_t->ier = 0x0000;
         can_mage_return_t->Packet_Interval = 0x00000000;
@@ -1395,7 +1408,7 @@ static void handle_can_info_query(int sock, ReqPacket *req) {
         struct timespec ts;
         clock_gettime(CLOCK_REALTIME, &ts);
         can_mage_return_t->timestamp = (uint64_t)ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
-        can_mage_return_t->xor_checksum = calculate_xor_checksum((uint8_t *)&can_mage_return_t, sizeof(CanConfigParam) - 4);
+        can_mage_return_t->xor_checksum = calculate_xor_checksum((const uint8_t *)can_mage_return_t, sizeof(*can_mage_return_t) - sizeof(can_mage_return_t->xor_checksum));
     }
     
     send_can_info_response(can_responses, AXICAN_MAX);
@@ -1438,7 +1451,7 @@ static void handle_can_buf_query(int sock, ReqPacket *req) {
             multi_response.channels[ch].normal_buf_remaining =
                 ringbuffer_32ch_avail(&g_data_buf_set, ch, 32);
             multi_response.channels[ch].pulse_buf_remaining =
-                ringbuffer_32ch_avail(&g_bcast_group_buf_set, ch, AXICAN_MAX);
+                broadcast_buffer_available(ch);
             multi_response.channels[ch].sim_buf_remaining =
                 ringbuffer_32ch_avail(&g_simulator_buf_set, ch, 32);
             multi_response.channels[ch].dmaddr_space = 0xFFFFFFFF;
@@ -1546,7 +1559,7 @@ static void send_version_query_response(uint16_t req_counter, uint32_t version) 
         shutdown(data_upload_socket, SHUT_RDWR);
         data_upload_socket = -1;
     } else {
-        printf("Sent version query response via port %d: version=0x%08X\n", TCP_PORT2, version);
+        printf("Sent version query response via port %d: result=0x%08X\n", TCP_PORT2, version);
     }
 
     pthread_mutex_unlock(&data_upload_mutex);
@@ -1561,21 +1574,31 @@ static void handle_version_query(int sock, ReqPacket *req) {
     }
 
     uint32_t query_type = reverse_4bytes(*(uint32_t *)req->data);
-    uint32_t version = VERSION_QUERY_FAILED;
+    uint32_t result = VERSION_QUERY_FAILED;
 
     if (query_type == VERSION_QUERY_ARM) {
-        version = ARM_APP_VERSION;
+        result = ARM_APP_VERSION;
     } else if (query_type == VERSION_QUERY_FPGA) {
-        version = VERSION_QUERY_FAILED;
+        result = VERSION_QUERY_FAILED;
+    } else if (query_type == VERSION_QUERY_ARM_PROGRAM) {
+        result = ARM_PROGRAM_TYPE;
     }
 
-    send_version_query_response(req->counter, version);
+    send_version_query_response(req->counter, result);
 }
 
 static int validate_broadcast_mask(uint32_t mask) {
     return ((mask & ~BCAST_CAN_MASK) == 0);
 }
 
+static uint32_t broadcast_buffer_available(uint8_t ch) {
+    pthread_mutex_lock(&bcast_state_mutex);
+    uint32_t available = ringbuffer_32ch_avail(&g_bcast_group_buf_set, ch, AXICAN_MAX);
+    pthread_mutex_unlock(&bcast_state_mutex);
+    return available;
+}
+
+/* 调用方必须持有 bcast_state_mutex；清理队列、唤醒次数和接收窗口。 */
 static void reset_broadcast_buffers(void) {
     for (uint8_t ch = 0; ch < AXICAN_MAX; ch++) {
         ringbuffer_32ch_reset(&g_bcast_group_buf_set, ch, AXICAN_MAX);
@@ -1637,6 +1660,7 @@ static void handle_broadcast_config(int sock, ReqPacket *req) {
         return;
     }
 
+    pthread_mutex_lock(&bcast_state_mutex);
     pthread_mutex_lock(&bcast_cfg_mutex);
     g_bcast_cfg.enable = param->enable;
     g_bcast_cfg.mode = param->b_mode;
@@ -1651,6 +1675,7 @@ static void handle_broadcast_config(int sock, ReqPacket *req) {
     pthread_mutex_unlock(&bcast_cfg_mutex);
 
     reset_broadcast_buffers();
+    pthread_mutex_unlock(&bcast_state_mutex);
 
     printf("[BCAST] config saved: enable=%u mode=%u active=0x%X A=0x%X B=0x%X start_ch=%u start_group=%u\n",
            param->enable, param->b_mode, param->active_mask, param->group_a_mask,
@@ -1756,31 +1781,45 @@ int buffer_write_data(uint8_t ch, uint8_t type, DataType data_type, const void *
 }
 
 // 解析请求包
+/* 9009 的长度字段表示载荷字节数；保持原有 4096 字节单包上限。 */
 ParseStatus parse_request_packet(const uint8_t *buffer, uint32_t buf_len, ReqPacket **packet) {
-    if (buf_len < sizeof(ReqPacket)) {
-        printf("Parse error: buffer too short (min %zu bytes)\n", sizeof(ReqPacket));
-        return PARSE_ERR_LEN;
-    }
-    
-    ReqPacket *req = (ReqPacket *)buffer;
+    if (!packet) return PARSE_ERR_LEN;
+    *packet = NULL;
+    if (!buffer) return PARSE_ERR_LEN;
+    if (buf_len < sizeof(ReqPacket)) return PARSE_NEED_MORE;
 
-    uint32_t req_sync_head = reverse_4bytes(req->sync_word);
-    if (req_sync_head != REQ_SYNC_WORD) {
-        printf("Parse error: invalid sync word (0x%08X, expected 0x%08X)\n",
-               req->sync_word, REQ_SYNC_WORD);
+    ReqPacket header;
+    memcpy(&header, buffer, sizeof(header));
+    if (reverse_4bytes(header.sync_word) != REQ_SYNC_WORD)
         return PARSE_ERR_SYNC;
-    }
-    uint32_t checksum_range_len = sizeof(req->sync_word) + sizeof(req->data_len) + 
-                                 sizeof(req->counter) + sizeof(req->cmd_type);
-    uint32_t expected_checksum = calculate_xor_checksum(buffer, checksum_range_len);
-    if (req->checksum != expected_checksum) {
-        printf("Parse error: checksum mismatch (receiver 0x%08X, expected 0x%08X)\n",
-               req->checksum, expected_checksum);
+
+    /* memcpy 避免在重新寻找同步字时对未对齐地址作 uint32_t 访问。 */
+    uint32_t words[3];
+    memcpy(words, buffer, sizeof(words));
+    if (header.checksum != (words[0] ^ words[1] ^ words[2]))
         return PARSE_ERR_CHECKSUM;
-    }
-    
-    *packet = req;
+
+    uint32_t payload_len = reverse_4bytes(header.data_len);
+    if (payload_len > BUFFER_SIZE - sizeof(ReqPacket))
+        return PARSE_ERR_LEN;
+    if (payload_len > buf_len - sizeof(ReqPacket))
+        return PARSE_NEED_MORE;
+
+    *packet = (ReqPacket *)buffer;
     return PARSE_SUCCESS;
+}
+
+/* 只约束处理函数实际读取的最小范围，保留既有尾部扩展兼容性。
+ * 版本查询已有严格长度检查及失败应答，仍交由原处理函数完成。 */
+static size_t command_min_payload_size(uint16_t command) {
+    switch (command) {
+        case CMD_CAN_CONFIG: return sizeof(CanConfigParam);
+        case CMD_CAN_INFO_QUERY: return sizeof(uint32_t);
+        case CMD_CAN_BUF_QUERY: return sizeof(CanBufQueryParam);
+        case CMD_CAN_START_STOP: return sizeof(CanStartStopParam);
+        case CMD_CAN_BROADCAST_CONFIG: return sizeof(BroadcastConfigParam);
+        default: return 0;
+    }
 }
 
 // 时间差计算函数
@@ -2253,7 +2292,7 @@ static void *axican_data_recv_thread(void* parameter) {
         
         if (!poll_rc) {
             // 读取CAN数据（axican_read_data返回：成功读取的帧数）
-            read_rc = axican_read_data(axican_info->f_rd.fd, axican_info->f_rd.flags, can_id, &axican_info->rx_frame,&g_can_buf_set,AXICAN_CHAN_MAX);
+            read_rc = axican_read_data(axican_info->f_rd.fd, axican_info->f_rd.flags, can_id, &axican_info->rx_frame,&g_can_buf_set,AXICAN_MAX);
             //printf("[CAN%d接收线程] 读取数据完成，帧数：%d\n", can_id, read_rc);
             // RX日志频率很高，需要排查接收数据时再打开。
             // printf("####axican_info->rx_frame.id:0x%08x\n",axican_info->rx_frame.can_id);
@@ -2679,11 +2718,14 @@ static int enqueue_broadcast_group(uint8_t target_ch, const PC_ARM_DATA_DATA *fr
         return -EINVAL;
     }
 
+    pthread_mutex_lock(&bcast_state_mutex);
     if (!is_broadcast_pps_window_open(target_ch)) {
+        pthread_mutex_unlock(&bcast_state_mutex);
         return -EINVAL;
     }
 
     if (ringbuffer_32ch_avail(&g_bcast_group_buf_set, target_ch, AXICAN_MAX) == 0) {
+        pthread_mutex_unlock(&bcast_state_mutex);
         return -ENOMEM;
     }
 
@@ -2697,9 +2739,11 @@ static int enqueue_broadcast_group(uint8_t target_ch, const PC_ARM_DATA_DATA *fr
     }
 
     if (ringbuffer_32ch_put(&g_bcast_group_buf_set, target_ch, &group, AXICAN_MAX) != 1) {
+        pthread_mutex_unlock(&bcast_state_mutex);
         return -ENOMEM;
     }
 
+    pthread_mutex_unlock(&bcast_state_mutex);
     return 0;
 }
 
@@ -2752,35 +2796,10 @@ static int process_9012_can_payload_frames(const uint8_t *payload, size_t payloa
     return enqueue_broadcast_group((uint8_t)packet_channel, frames, frame_count);
 }
 
-static void process_download_data_batch(const uint8_t *buffer, size_t total_len) {
-    // 快速参数校验
-    if (!buffer || total_len == 0) {
-        printf("[9012 handler] Invalid input (buffer=%p, len=%zu)\n", buffer, total_len);
-        send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, -EINVAL, "invalid input");
-        return;
-    }
-    // 步骤1：高效处理暂存区（避免溢出与冗余拷贝）
-    const size_t temp_buf_max = sizeof(g_temp_buf);
-    if (g_temp_len + total_len > temp_buf_max) {
-        printf("[9012 handler] Temp buffer overflow (current=%zu, new=%zu, max=%zu)\n",
-               g_temp_len, total_len, temp_buf_max);
-        // 仅保留最新数据（减少丢失窗口）
-        size_t keep_len = temp_buf_max - total_len;
-        printf("[9012 handler] Adjusting temp buffer - keep_len=%zu, discarding=%zu\n",
-               keep_len, g_temp_len - keep_len);
-        
-        if (keep_len > 0 && g_temp_len > 0) {
-            memmove(g_temp_buf, g_temp_buf + (g_temp_len - keep_len), keep_len);
-            printf("[9012 handler] Moved %zu bytes to front of temp buffer\n", keep_len);
-        }
-        g_temp_len = keep_len;
-        send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, -ENOMEM, "temp buffer overflow");
-    }
-    
-    // 拷贝新数据到暂存区
-    memcpy(g_temp_buf + g_temp_len, buffer, total_len);
-    g_temp_len += total_len;
- 
+static void process_download_data_batch(DownloadStream *stream) {
+    if (!stream || stream->used > sizeof(stream->bytes)) return;
+    uint8_t *buffer = stream->bytes;
+    const size_t temp_buf_max = sizeof(stream->bytes);
 
     // 步骤2：结构化解析数据包（减少重复计算）
     size_t offset = 0;
@@ -2789,43 +2808,29 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
     const uint32_t expected_sync = PC_ARM_DATA_WORD;
 
 
-    while (offset + req_header_size <= g_temp_len) {
+    while (offset + req_header_size <= stream->used) {
 
         
         // 解析头部（避免重复指针转换）
-        DATA_ReqPacket *req = (DATA_ReqPacket*)(g_temp_buf + offset);
-        uint32_t req_sync_datelen=reverse_4bytes(req->data_len);
-        uint32_t req_sync_datehead=reverse_4bytes(req->sync_word);
-        const size_t pkg_total_len = req_header_size + reverse_4bytes(req->data_len);
-
-
-        // 检查包完整性（提前退出条件）
-        if (offset + pkg_total_len > g_temp_len) {
-            // printf("[9012 parser] Incomplete packet at offset=%zu (needs=%zu, has=%zu) - stopping parse\n",
-            //        offset, pkg_total_len, g_temp_len - offset);
-            break;
-        }
-
-        // 同步字校验（快速失败）
-        if (req_sync_datehead != expected_sync) {
-            printf("[9012] Sync mismatch (offset=%zu, got=0x%08X, exp=0x%08X) - skipping byte\n",
-                   offset, req->sync_word, expected_sync);
+        DATA_ReqPacket *req = (DATA_ReqPacket*)(buffer + offset);
+        uint32_t payload_size = reverse_4bytes(req->data_len);
+        if (reverse_4bytes(req->sync_word) != expected_sync) {
             offset++;
             error_count++;
             continue;
         }
-
-        // 外层校验和（预计算长度常量）
         const uint32_t checksum_len = sizeof(req->sync_word) + sizeof(req->data_len) +
-                                     sizeof(req->counter) + sizeof(req->cmd_type);
-        const uint32_t actual_checksum = calculate_xor_checksum(g_temp_buf + offset, checksum_len);
-        if (req->checksum != actual_checksum) {
-            printf("[9012] Checksum mismatch (offset=%zu, got=0x%08X, exp=0x%08X) - skipping packet\n",
-                   offset, req->checksum, actual_checksum);
-            offset += pkg_total_len;
+                                      sizeof(req->counter) + sizeof(req->cmd_type);
+        if (req->checksum != calculate_xor_checksum(buffer + offset, checksum_len) ||
+            payload_size > temp_buf_max - req_header_size) {
+            /* 包头不可信，不能使用它的长度跳过数据或等待半包。 */
+            offset++;
             error_count++;
             continue;
         }
+        const size_t pkg_total_len = req_header_size + (size_t)payload_size;
+        if (pkg_total_len > stream->used - offset) break;
+
         // 按命令类型处理（减少嵌套层级）
         uint16_t req_sync_datecmd=reverse_2bytes(req->cmd_type);
         const size_t payload_len = reverse_4bytes(req->data_len);
@@ -2849,7 +2854,16 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
 
         switch (req_sync_datecmd) {
             case 0x0001: { // 正常CAN数据
+                if (payload_len < sizeof(PC_ARM_DATA_DATA)) {
+                    valid = false;
+                    break;
+                }
                 PC_ARM_DATA_DATA *hdr = (PC_ARM_DATA_DATA*)data_ptr;
+                if (hdr->length < sizeof(*hdr) || hdr->length > payload_len ||
+                    hdr->length % sizeof(uint32_t) != 0) {
+                    valid = false;
+                    break;
+                }
                 
                 if (hdr->head != PC_STATUS_HEAD) {
                     printf("[9012] CAN inner sync invalid (offset=%zu, val=0x%08X)\n", offset, hdr->head);
@@ -2870,7 +2884,8 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
                 // 通道有效性校验
                 if (can_id >= AXICAN_MAX || !can_configs[can_id].valid) {
                     printf("[9012] Invalid CAN channel %d (max=%d, valid=%d)\n", 
-                           can_id, AXICAN_MAX, can_configs[can_id].valid);
+                           can_id, AXICAN_MAX,
+                           can_id < AXICAN_MAX ? can_configs[can_id].valid : 0);
                     valid = false;
                 }
                 break;
@@ -2878,7 +2893,16 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
 
             case 0x0003: { // 模拟数据
                 printf("[9012 parser] Processing simulator data packet (offset=%zu)\n", offset);
+                if (payload_len < sizeof(PC_ARM_SIMULATOR_DATA)) {
+                    valid = false;
+                    break;
+                }
                 PC_ARM_SIMULATOR_DATA *sim = (PC_ARM_SIMULATOR_DATA*)data_ptr;
+                if (sim->channel_id >= g_simulator_buf_set.max_channel ||
+                    sim->send_len > sizeof(sim->send_data)) {
+                    valid = false;
+                    break;
+                }
                 
                 if (sim->head != PC_STATUS_HEAD) {
                     printf("sim->head:0x%08x along_data PC_STATUS_HEAD:0x%08x\n",sim->head,PC_STATUS_HEAD);
@@ -2893,6 +2917,10 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
             }
 
             case 0x0002: { // 秒脉冲数据
+                if (payload_len < sizeof(SecondPulseData)) {
+                    valid = false;
+                    break;
+                }
                 printf("[9012 parser] Processing second pulse data (offset=%zu)\n", offset);
                 can_id = 0; // 固定通道
                 data_type = DATA_TYPE_SECOND_PULSE;
@@ -2901,6 +2929,10 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
 
             case 0x0005: { // DMA数据
                 printf("[9012 parser] Processing DMA data (offset=%zu)\n", offset);
+                if (payload_len < sizeof(PC_DMA_DATA)) {
+                    valid = false;
+                    break;
+                }
                 PC_DMA_DATA *dma = (PC_DMA_DATA*)data_ptr;
                 can_id = dma->DMA_CHINNEL;
                 data_type = DATA_TYPE_DMA;
@@ -2973,12 +3005,12 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
    
     // 高效处理剩余数据（减少内存移动）
     if (offset > 0) {
-        if (offset < g_temp_len) {
-            const size_t remaining = g_temp_len - offset;
-            memmove(g_temp_buf, g_temp_buf + offset, remaining);
-            g_temp_len = remaining;
+        if (offset < stream->used) {
+            const size_t remaining = stream->used - offset;
+            memmove(buffer, buffer + offset, remaining);
+            stream->used = remaining;
         } else {
-            g_temp_len = 0;
+            stream->used = 0;
         }
     }
 }
@@ -2988,7 +3020,12 @@ static void process_download_data_batch(const uint8_t *buffer, size_t total_len)
 static void *tcp_client_handler_9012(void *client_socket) {
     int sock = *(int *)client_socket;
     free(client_socket);
-    uint8_t buffer[BUFFER_SIZE_1];
+    DownloadStream *stream = calloc(1, sizeof(*stream));
+    if (!stream) {
+        perror("allocate 9012 stream");
+        close(sock);
+        return NULL;
+    }
     ssize_t bytes_read;
 
     configure_tcp_keepalive(sock, DATA_DOWNLOAD_PORT);
@@ -2996,6 +3033,7 @@ static void *tcp_client_handler_9012(void *client_socket) {
     printf("New data download client connected on port %d, socket: %d\n", 
            DATA_DOWNLOAD_PORT, sock);
     
+    pthread_mutex_lock(&download_process_mutex);
     pthread_mutex_lock(&data_download_mutex);
     if (data_download_socket != -1) {
         shutdown(data_download_socket, SHUT_RDWR);
@@ -3003,23 +3041,30 @@ static void *tcp_client_handler_9012(void *client_socket) {
     }
     data_download_socket = sock;
     pthread_mutex_unlock(&data_download_mutex);
+    pthread_mutex_unlock(&download_process_mutex);
     
     while (running) {
         // 读取TCP数据（可能包含多个DATA_ReqPacket）
-        bytes_read = recv(sock, buffer, BUFFER_SIZE_1, 0);
+        size_t space = sizeof(stream->bytes) - stream->used;
+        if (space == 0) break; /* 防御性检查：完整最大包应已在上次解析中消费。 */
+        size_t receive_size = space < BUFFER_SIZE_1 ? space : BUFFER_SIZE_1;
+        bytes_read = recv(sock, stream->bytes + stream->used, receive_size, 0);
+        if (bytes_read < 0 && errno == EINTR) continue;
         if (bytes_read <= 0) {
             if (bytes_read < 0) {
                 perror("recv failed in 9012 handler");
             }
             break;
         }
-        //Can_Byte += bytes_read;
-        process_download_data_batch(buffer, bytes_read);
-        // // 更新TCP缓冲区使用量
-        // update_tcp_buffer_usage(bytes_read);
-        
-        // process_download_data_batch(buffer, bytes_read);
-       
+        stream->used += (size_t)bytes_read;
+        pthread_mutex_lock(&download_process_mutex);
+        pthread_mutex_lock(&data_download_mutex);
+        int is_current = (data_download_socket == sock);
+        pthread_mutex_unlock(&data_download_mutex);
+        if (is_current) process_download_data_batch(stream);
+        pthread_mutex_unlock(&download_process_mutex);
+        if (!is_current) break;
+
     }
     
     pthread_mutex_lock(&data_download_mutex);
@@ -3028,6 +3073,7 @@ static void *tcp_client_handler_9012(void *client_socket) {
     }
     pthread_mutex_unlock(&data_download_mutex);
     printf("Data download client disconnected on port %d\n", DATA_DOWNLOAD_PORT);
+    free(stream);
     close(sock);
     return NULL;
 }
@@ -3296,67 +3342,77 @@ static void *tcp_listen_thread_9011(void *port_ptr) {
 static void *tcp_client_handler_9009(void *client_socket) {
     int sock = *(int *)client_socket;
     free(client_socket);
-    uint8_t buffer[BUFFER_SIZE];
-    ssize_t bytes_read;
+    /* 每个连接独立保存半包；每次移动到首地址后再调用原命令处理函数。 */
+    union {
+        uint64_t alignment;
+        uint8_t bytes[BUFFER_SIZE];
+    } storage;
+    uint8_t *buffer = storage.bytes;
+    size_t buffered = 0;
 
     configure_tcp_keepalive(sock, TCP_PORT1);
-    
     printf("New CAN command client connected on port %d, socket: %d\n", TCP_PORT1, sock);
-    
+
     while (running) {
-        bytes_read = recv(sock, buffer, BUFFER_SIZE, 0);
+        ssize_t bytes_read = recv(sock, buffer + buffered, BUFFER_SIZE - buffered, 0);
+        if (bytes_read < 0 && errno == EINTR) continue;
         if (bytes_read <= 0) {
             if (bytes_read < 0) {
                 perror("recv from port 9009 error");
-                send_event(EVENT_LEVEL_ERROR,EVENT_CAN_SENT_FAILE,errno,"9009 port recv failed" );
+                send_event(EVENT_LEVEL_ERROR, EVENT_CAN_SENT_FAILE, errno, "9009 port recv failed");
             }
             break;
         }
-        
-        
-        ReqPacket *req_packet;
-        ParseStatus status = parse_request_packet(buffer, bytes_read, &req_packet);
-        if (status != PARSE_SUCCESS) {
-            const char *err_msg;
-            switch (status) {
-                case PARSE_ERR_SYNC: err_msg = "Invalid sync word"; break;
-                case PARSE_ERR_LEN: err_msg = "Invalid packet length"; break;
-                case PARSE_ERR_CHECKSUM: err_msg = "Checksum mismatch"; break;
-                default: err_msg = "Unknown parse error";
+        buffered += (size_t)bytes_read;
+
+        while (buffered >= sizeof(ReqPacket)) {
+            ReqPacket *req_packet = NULL;
+            ParseStatus status = parse_request_packet(buffer, buffered, &req_packet);
+            if (status == PARSE_NEED_MORE) break;
+            if (status != PARSE_SUCCESS) {
+                /* 错误包头逐字节重新同步，不信任其中声明的长度。 */
+                memmove(buffer, buffer + 1, --buffered);
+                continue;
             }
-            //send_event(EVENT_LEVEL_FATAL, EVENT_CAN_INIT_FAILED, -1, "CAN controller initialization failed");
-            continue;
-        }
-        uint16_t req_commond_type = reverse_2bytes(req_packet->cmd_type);
-        switch ( req_commond_type) {
-            case CMD_CAN_CONFIG:
-                handle_can_config(sock, req_packet);
-                break;
-            case CMD_CAN_INFO_QUERY:
-                handle_can_info_query(sock, req_packet);
-                break;
-            case CMD_CAN_BUF_QUERY:
-                handle_can_buf_query(sock, req_packet);
-                break;
-            case CMD_CAN_START_STOP:
-                handle_can_start_stop(sock, req_packet);
-                break;
-            case CMD_CAN_BROADCAST_CONFIG:
-                handle_broadcast_config(sock, req_packet);
-                break;
-            case CMD_VERSION_QUERY:
-                handle_version_query(sock, req_packet);
-                break;
-            default: {
-                const char *err_msg = "Unknown CAN command";
-                printf("Unknown CAN command: 0x%04X\n", req_packet->cmd_type);
-                send_event(EVENT_LEVEL_ERROR,EVENT_CAN_SENT_FAILE,errno,err_msg );
-                
-                break;
+            size_t payload_len = reverse_4bytes(req_packet->data_len);
+            size_t packet_len = sizeof(ReqPacket) + payload_len;
+            uint16_t command = reverse_2bytes(req_packet->cmd_type);
+            if (payload_len < command_min_payload_size(command)) {
+                printf("[9009] command 0x%04X payload too short: %zu\n", command, payload_len);
+            } else {
+                switch (command) {
+                    case CMD_CAN_CONFIG:
+                        handle_can_config(sock, req_packet);
+                        break;
+                    case CMD_CAN_INFO_QUERY:
+                        handle_can_info_query(sock, req_packet);
+                        break;
+                    case CMD_CAN_BUF_QUERY:
+                        handle_can_buf_query(sock, req_packet);
+                        break;
+                    case CMD_CAN_START_STOP:
+                        handle_can_start_stop(sock, req_packet);
+                        break;
+                    case CMD_CAN_BROADCAST_CONFIG:
+                        handle_broadcast_config(sock, req_packet);
+                        break;
+                    case CMD_VERSION_QUERY:
+                        handle_version_query(sock, req_packet);
+                        break;
+                    default: {
+                        const char *err_msg = "Unknown CAN command";
+                        printf("Unknown CAN command: 0x%04X\n", req_packet->cmd_type);
+                        send_event(EVENT_LEVEL_ERROR,EVENT_CAN_SENT_FAILE,errno,err_msg );
+
+                        break;
+                    }
+                }
             }
+            buffered -= packet_len;
+            memmove(buffer, buffer + packet_len, buffered);
         }
     }
-    
+
     printf("CAN command client disconnected on port %d, socket: %d\n", TCP_PORT1, sock);
     close(sock);
     return NULL;
@@ -3461,9 +3517,9 @@ static void* axican_data_process_thread_1(void* parameter)
 
         actual_count = 0;
         // 最多读取DEQUEUE_BATCH_SIZE帧，但不超过缓冲区中实际存在的帧数
-        uint32_t available = ringbuffer_32ch_avail(&g_poll_buf_set, can_id, 6);
-        uint32_t read_count = (available < DEQUEUE_BATCH_SIZE) ? 
-                             available : DEQUEUE_BATCH_SIZE;
+        uint32_t queued_frames = ringbuffer_32ch_len(&g_poll_buf_set, can_id, 6);
+        uint32_t read_count = (queued_frames < DEQUEUE_BATCH_SIZE) ?
+                             queued_frames : DEQUEUE_BATCH_SIZE;
 
         for (int i = 0; i < read_count; i++)
         {
@@ -3541,9 +3597,9 @@ static void* axican_data_process_thread(void* parameter)
         /* ---- 2. 从环形缓冲区批量读取数据 ---- */
         actual_count = 0;
         // 最多读取DEQUEUE_BATCH_SIZE帧，但不超过缓冲区中实际存在的帧数
-        uint32_t available = ringbuffer_32ch_avail(&g_can_buf_set, can_id, 6);
-        uint32_t read_count = (available < DEQUEUE_BATCH_SIZE) ? 
-                             available : DEQUEUE_BATCH_SIZE;
+        uint32_t queued_frames = ringbuffer_32ch_len(&g_can_buf_set, can_id, 6);
+        uint32_t read_count = (queued_frames < DEQUEUE_BATCH_SIZE) ?
+                             queued_frames : DEQUEUE_BATCH_SIZE;
 
         for (int i = 0; i < read_count; i++)
         {
@@ -3921,6 +3977,14 @@ static void notify_broadcast_channels(uint32_t mask) {
     }
 }
 
+static void process_broadcast_pps(void) {
+    pthread_mutex_lock(&bcast_state_mutex);
+    set_broadcast_rx_gate(1);
+    uint32_t wake_mask = select_broadcast_mask_on_pps();
+    if (wake_mask != 0) notify_broadcast_channels(wake_mask);
+    pthread_mutex_unlock(&bcast_state_mutex);
+}
+
 static void *pps_irq_thread(void *arg) {
     (void)arg;
 
@@ -3954,13 +4018,7 @@ static void *pps_irq_thread(void *arg) {
             unsigned int irq_count = 0;
             ioctl(fd, ZMUAV_PL2PS_IRQ_GET_IRQ_COUNT, &irq_count);
 
-            set_broadcast_rx_gate(1);
-
-            uint32_t wake_mask = select_broadcast_mask_on_pps();
-            if (wake_mask != 0) {
-            // printf("[PPS] irq=%u arm broadcast mask=0x%X\n", irq_count, wake_mask);
-            notify_broadcast_channels(wake_mask);
-            }
+            process_broadcast_pps();
         }
     }
 
@@ -4014,6 +4072,24 @@ static int send_broadcast_group_for_channel(uint8_t can_id, const BroadcastFrame
     return 0;
 }
 
+/* 领取唤醒和取组必须属于同一事务，防止重置后的新组消费旧唤醒。
+ * 已取到线程局部变量中的组保持原行为，允许发送完成。 */
+static uint32_t take_broadcast_group(uint8_t can_id, BroadcastFrameGroup *group) {
+    if (can_id >= AXICAN_MAX || !group) return 0;
+    uint32_t result = 0;
+    pthread_mutex_lock(&bcast_state_mutex);
+    pthread_mutex_lock(&g_bcast_wake[can_id].mutex);
+    if (g_bcast_wake[can_id].pending != 0) {
+        g_bcast_wake[can_id].pending--;
+        if (can_configs[can_id].state == CAN_STATE_OPENED) {
+            result = ringbuffer_32ch_get(&g_bcast_group_buf_set, can_id, group, AXICAN_MAX);
+        }
+    }
+    pthread_mutex_unlock(&g_bcast_wake[can_id].mutex);
+    pthread_mutex_unlock(&bcast_state_mutex);
+    return result;
+}
+
 static void *broadcast_can_send_thread(void *parameter) {
     struct axican *axican_info = (struct axican *)parameter;
     if (!axican_info) {
@@ -4032,18 +4108,11 @@ static void *broadcast_can_send_thread(void *parameter) {
             pthread_mutex_unlock(&g_bcast_wake[can_id].mutex);
             break;
         }
-        g_bcast_wake[can_id].pending--;
         pthread_mutex_unlock(&g_bcast_wake[can_id].mutex);
-
-        if (can_configs[can_id].state != CAN_STATE_OPENED) {
-            continue;
-        }
 
         BroadcastFrameGroup group;
         memset(&group, 0, sizeof(group));
-        uint32_t get_ret = ringbuffer_32ch_get(&g_bcast_group_buf_set, can_id, &group, AXICAN_MAX);
-        // printf("[BCAST TX] CAN%u get=%u remaining=%u\n",
-        //        can_id, get_ret, ringbuffer_32ch_avail(&g_bcast_group_buf_set, can_id, AXICAN_MAX));
+        uint32_t get_ret = take_broadcast_group(can_id, &group);
         if (get_ret != 1) {
             continue;
         }
@@ -4096,7 +4165,7 @@ static void *send_data_tid_thread(void* parameter)
         // 无论是否有数据，都尝试读取（axican_read_data_t内部会检查帧数量）
         if (!rc) { 
             // 直接传入栈上缓冲区，避免成员访问开销
-            int read_count = axican_read_data_t(axican_info->f_wr.fd, axican_info->f_wr.flags, can_id, &axican_info->tx_frame,&g_can_buf_set,AXICAN_CHAN_MAX);
+            int read_count = axican_read_data_t(axican_info->f_wr.fd, axican_info->f_wr.flags, can_id, &axican_info->tx_frame,&g_can_buf_set,AXICAN_MAX);
             if (read_count < 0) {
                 fprintf(stderr, "[CAN%d] 读取错误 (code: %d)\n", can_id, read_count);
             }
@@ -4160,7 +4229,7 @@ static void *buffer_report_thread(void *arg) {
             // 其他缓冲区信息
             curr_ch->normal_buf_remaining = ringbuffer_avail(g_data_buf_set.channels[ch]);
             // 复用原秒脉冲余量字段，上报当前PPS广播组缓冲区剩余组数。
-            curr_ch->pulse_buf_remaining = ringbuffer_avail(g_bcast_group_buf_set.channels[ch]);
+            curr_ch->pulse_buf_remaining = broadcast_buffer_available(ch);
             curr_ch->sim_buf_remaining = ringbuffer_avail(g_simulator_buf_set.channels[ch]);
             curr_ch->dmaddr_space=0xFFFFFFFF;
             curr_ch->vfifo_space=0xFFFFFFFF;
@@ -4266,59 +4335,46 @@ int main(void) {
     ret = ringbuffer_32ch_init(&g_data_buf_set, sizeof(PC_ARM_DATA_DATA), 65536*2,32);
     if (ret != 0) {
         perror("初始化核心数据环形缓冲区失败");
+        destroy_all_ring_buffers();
         return -1;
     }
-    // 2. 初始化模拟器数据缓冲区（PC_ARM_SIMULATOR_DATA类型，每个通道容量512帧）
+    // 2. 初始化模拟器数据缓冲区（PC_ARM_SIMULATOR_DATA类型，每个通道容量32帧）
     ret = ringbuffer_32ch_init(&g_simulator_buf_set, sizeof(PC_ARM_SIMULATOR_DATA), 32,32);
     if (ret != 0) {
         perror("初始化模拟器数据环形缓冲区失败");
-        ringbuffer_32ch_destory(&g_data_buf_set,32); // 回滚已初始化的缓冲区
+        destroy_all_ring_buffers();
         return -1;
     }
     // 3. 初始化秒脉冲数据缓冲区（SecondPulseData类型，每个通道容量2048帧）
     ret = ringbuffer_32ch_init(&g_pulse_buf_set, sizeof(SecondPulseData), 2048,32);
     if (ret != 0) {
         perror("初始化秒脉冲数据环形缓冲区失败");
-        ringbuffer_32ch_destory(&g_data_buf_set,32);
-        ringbuffer_32ch_destory(&g_simulator_buf_set,32);
+        destroy_all_ring_buffers();
         return -1;
     }
     //创建CAN接收数据正常数据的队列6个队列
     ret = ringbuffer_32ch_init(&g_can_buf_set,sizeof(struct axican_frame),32768,6);
     if (ret != 0) {
         perror("初始化CAN队列缓冲区失败");
-        ringbuffer_32ch_destory(&g_data_buf_set,32); // 回滚已初始化的缓冲区
+        destroy_all_ring_buffers();
         return -1;
     }
     //创建CAN监控数据正常数据的队列6个队列
     ret = ringbuffer_32ch_init(&g_poll_buf_set,sizeof(struct axican_frame),32768,6);
     if (ret != 0) {
         perror("初始化CAN队列缓冲区失败");
-        ringbuffer_32ch_destory(&g_data_buf_set,32); // 回滚已初始化的缓冲区
+        destroy_all_ring_buffers();
         return -1;
     }
 
     ret = ringbuffer_32ch_init(&g_bcast_group_buf_set, sizeof(BroadcastFrameGroup), BCAST_GROUP_QUEUE_DEPTH, AXICAN_MAX);
     if (ret != 0) {
         perror("初始化广播组缓冲区失败");
-        ringbuffer_32ch_destory(&g_data_buf_set,32);
-        ringbuffer_32ch_destory(&g_simulator_buf_set,32);
-        ringbuffer_32ch_destory(&g_pulse_buf_set,32);
-        ringbuffer_32ch_destory(&g_can_buf_set,6);
-        ringbuffer_32ch_destory(&g_poll_buf_set,6);
+        destroy_all_ring_buffers();
         return -1;
     }
 
-    printf("所有环形缓冲区初始化完成(核心数据:65536帧/通道,模拟器:32帧/通道,秒脉冲:2048帧/通道）\n");
-    //CAN接收线程缓冲区
-    for (int i = 0; i < AXICAN_MAX; i++) {
-        can_queue_init(&can_queues[i], 100000);  // 每个队列最大10000帧
-      //  printf("初始化CAN%d队列完成\n", i);
-    }
-
-
-
-
+    printf("所有环形缓冲区初始化完成(核心数据:131072帧/通道,模拟器:32帧/通道,秒脉冲:2048帧/通道）\n");
 
     // 初始化CAN设备
     for (id = 0; id < AXICAN_MAX; id++) {
@@ -4528,6 +4584,7 @@ int main(void) {
 	    pthread_mutex_destroy(&data_upload_mutex);
 	    pthread_mutex_destroy(&data_download_mutex);
 	    pthread_mutex_destroy(&data_counter_mutex);
+    pthread_mutex_destroy(&bcast_state_mutex);
     pthread_mutex_destroy(&bcast_cfg_mutex);
     pthread_mutex_destroy(&bcast_group_id_mutex);
     pthread_mutex_destroy(&bcast_rx_gate_mutex);

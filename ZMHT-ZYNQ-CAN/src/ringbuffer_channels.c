@@ -35,7 +35,7 @@ static inline uint32_t rounddown_pow_of_two(uint32_t n)
 	n |= n >> 4;
 	n |= n >> 8;
 	n |= n >> 16;
-	return (n + 1) >> 1;
+	return n - (n >> 1);
 }
 
 // -------------------------- 单个环形缓冲区实现 --------------------------
@@ -324,12 +324,18 @@ int ringbuffer_32ch_init(RingBuffer32ChSet *set, uint32_t elem_size, uint32_t bu
     if (actual_cap == 0) {
         actual_cap = 1;  // 最小容量保障
     }
+    if (actual_cap > UINT32_MAX / elem_size) {
+        memset(set, 0, sizeof(*set));
+        errno = EOVERFLOW;
+        return -1;
+    }
     set->buf_capacity = actual_cap;
 
     // 4. 动态分配通道数组（核心：支持任意通道数）
     set->channels = (ring_buffer_t **)malloc(sizeof(ring_buffer_t *) * MAX_Channel);
     if (set->channels == NULL) {
         perror("ringbuffer_32ch_init: malloc channels failed");
+        memset(set, 0, sizeof(*set));
         return -1;
     }
     memset(set->channels, 0, sizeof(ring_buffer_t *) * MAX_Channel);  // 避免野指针
@@ -340,13 +346,8 @@ int ringbuffer_32ch_init(RingBuffer32ChSet *set, uint32_t elem_size, uint32_t bu
         set->channels[i] = ringbuffer_create(buf_size, elem_size);
         if (set->channels[i] == NULL) {
             perror("ringbuffer_32ch_init: create channel buffer failed");
-            // 回滚：释放已创建的通道资源
-            for (int j = 0; j < i; j++) {
-                ringbuffer_destory(set->channels[j]);
-                set->channels[j] = NULL;
-            }
-            free(set->channels);
-            set->channels = NULL;
+            // 通道数组已清零，统一释放已分配的通道及数组。
+            ringbuffer_32ch_destory(set, MAX_Channel);
             return -1;
         }
     }
@@ -360,18 +361,32 @@ int ringbuffer_32ch_init(RingBuffer32ChSet *set, uint32_t elem_size, uint32_t bu
 void ringbuffer_32ch_destory(RingBuffer32ChSet *set,uint8_t MAX_Channel)
 {
     int i;
+    // 保留现有接口；释放范围以初始化时记录的实际通道数为准。
+    (void)MAX_Channel;
     if (set == NULL) {
         return;
     }
 
-    // 销毁每个通道的缓冲区
-    for (i = 0; i <  MAX_Channel; i++) {
-        ringbuffer_destory(set->channels[i]);
-        set->channels[i] = NULL;
+    // 允许清理未初始化、初始化失败或已经销毁的集合。
+    if (set->channels != NULL) {
+        for (i = 0; i < set->max_channel; i++) {
+            ringbuffer_destory(set->channels[i]);
+        }
+        free(set->channels);
     }
 
     // 清除集合元数据
     memset(set, 0, sizeof(RingBuffer32ChSet));
+}
+
+/* 先检查数组和实际分配范围，再访问 channels[ch]。
+ * MAX_Channel 保留为调用方上限，不能扩大实际已分配通道数。 */
+static bool ringbuffer_channel_valid(const RingBuffer32ChSet *set,
+                                     uint8_t ch, uint8_t max_channel)
+{
+    return set != NULL && set->channels != NULL &&
+           ch < max_channel && ch < set->max_channel &&
+           set->channels[ch] != NULL;
 }
 
 /**
@@ -380,7 +395,7 @@ void ringbuffer_32ch_destory(RingBuffer32ChSet *set,uint8_t MAX_Channel)
 uint32_t ringbuffer_32ch_put(RingBuffer32ChSet *set, uint8_t ch, const void *data,uint8_t MAX_Channel)
 {
     // 1. 校验参数
-    if (set == NULL || data == NULL || ch >= MAX_Channel || set->channels[ch] == NULL) {
+    if (data == NULL || !ringbuffer_channel_valid(set, ch, MAX_Channel)) {
         errno = EINVAL;
         return 0;
     }
@@ -395,7 +410,7 @@ uint32_t ringbuffer_32ch_put(RingBuffer32ChSet *set, uint8_t ch, const void *dat
 uint32_t ringbuffer_32ch_get(RingBuffer32ChSet *set, uint8_t ch, void *data,uint8_t MAX_Channel)
 {
     // 1. 校验参数
-    if (set == NULL || data == NULL || ch >= MAX_Channel || set->channels[ch] == NULL) {
+    if (data == NULL || !ringbuffer_channel_valid(set, ch, MAX_Channel)) {
         errno = EINVAL;
         return 0;
     }
@@ -409,7 +424,7 @@ uint32_t ringbuffer_32ch_get(RingBuffer32ChSet *set, uint8_t ch, void *data,uint
  */
 uint32_t ringbuffer_32ch_len(RingBuffer32ChSet *set, uint8_t ch,uint8_t MAX_Channel)
 {
-    if (set == NULL || ch >= MAX_Channel || set->channels[ch] == NULL) {
+    if (!ringbuffer_channel_valid(set, ch, MAX_Channel)) {
         return 0;
     }
     return ringbuffer_len(set->channels[ch]);
@@ -420,13 +435,13 @@ uint32_t ringbuffer_32ch_len(RingBuffer32ChSet *set, uint8_t ch,uint8_t MAX_Chan
  */
 void ringbuffer_32ch_reset(RingBuffer32ChSet *set, uint8_t ch,uint8_t MAX_Channel)
 {
-    if (set != NULL && ch < MAX_Channel && set->channels[ch] != NULL) {
+    if (ringbuffer_channel_valid(set, ch, MAX_Channel)) {
         ringbuffer_reset(set->channels[ch]);
     }
 }
 uint32_t ringbuffer_32ch_avail(RingBuffer32ChSet *set, uint8_t ch,uint8_t MAX_Channel) {
     // 校验参数合法性
-    if (set == NULL || ch >= MAX_Channel|| set->channels[ch] == NULL) {
+    if (!ringbuffer_channel_valid(set, ch, MAX_Channel)) {
         return 0; // 无效参数，返回 0 表示无可用空间
     }
     // 调用单通道缓冲区的可用空间函数
